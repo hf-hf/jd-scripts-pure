@@ -52,11 +52,11 @@ async function execSign() {
   console.log(`\n开始执行脚本签到，请稍等`)
   try {
     if (notify.SCKEY || notify.BARK_PUSH || notify.DD_BOT_TOKEN || (notify.TG_BOT_TOKEN && notify.TG_USER_ID) || notify.IGOT_PUSH_KEY) {
-      await exec("node JD_DailyBonus.js >> result.txt");
+      await exec("/usr/bak/nodejs/node-v12.16.0-linux-x64/bin/node /app/jd_scripts/JD_DailyBonus.js >> result.txt");
     } else {
       // 如果没有提供通知推送，则打印日志
       console.log('没有提供通知推送，则打印脚本执行日志')
-      await exec(`node JD_DailyBonus.js`, { stdio: "inherit" });
+      await exec(`/usr/bak/nodejs/node-v12.16.0-linux-x64/bin/node /app/jd_scripts/JD_DailyBonus.js`, { stdio: "inherit" });
     }
     // await exec("node JD_DailyBonus.js", { stdio: "inherit" });
     // console.log('执行完毕', new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleDateString())
@@ -107,11 +107,12 @@ async function downFile () {
   //   url = 'https://cdn.jsdelivr.net/gh/NobyDa/Script@master/JD-DailyBonus/JD_DailyBonus.js';
   // }
   await downloadUrl();
-  if ($.body) {
-    url = 'https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js';
-  } else {
-    url = 'https://cdn.jsdelivr.net/gh/NobyDa/Script@master/JD-DailyBonus/JD_DailyBonus.js';
-  }
+  url = 'https://cdn.jsdelivr.net/gh/NobyDa/Script@master/JD-DailyBonus/JD_DailyBonus.js';
+  //if ($.body) {
+  //  url = 'https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js';
+  //} else {
+  //  url = 'https://cdn.jsdelivr.net/gh/NobyDa/Script@master/JD-DailyBonus/JD_DailyBonus.js';
+  //}
   await download(url, './')
 }
 
@@ -182,7 +183,7 @@ function TotalBean() {
     })
   })
 }
-function downloadUrl(url = 'https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js') {
+function downloadUrl(url = 'https://cdn.jsdelivr.net/gh/NobyDa/Script@master/JD-DailyBonus/JD_DailyBonus.js') {
   return new Promise(resolve => {
     $.get({url}, async (err, resp, data) => {
       try {

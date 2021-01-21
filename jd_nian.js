@@ -9,17 +9,17 @@
 ============Quantumultx===============
 [task_local]
 #京东炸年兽🧨
-0 8 * * * https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js, tag=京东炸年兽🧨, enabled=true
+10 * * * * https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js, tag=京东炸年兽🧨, img-url=https://raw.githubusercontent.com/yogayyy/Scripts/main/Icon/lxk0301/jd_nian.png, enabled=true
 
 ================Loon==============
 [Script]
-cron "0 8 * * *" script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js,tag=京东炸年兽🧨
+cron "10 * * * *" script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js,tag=京东炸年兽🧨
 
 ===============Surge=================
-京东炸年兽🧨 = type=cron,cronexp="0 8 * * *",wake-system=1,timeout=200,script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js
+京东炸年兽🧨 = type=cron,cronexp="10 * * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js
 
 ============小火箭=========
-京东炸年兽🧨 = type=cron,script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js, cronexpr="0 8 * * *", timeout=200, enable=true
+京东炸年兽🧨 = type=cron,script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js, cronexpr="10 * * * *", timeout=3600, enable=true
  */
 const $ = new Env('京东炸年兽🧨');
 
@@ -45,7 +45,10 @@ if ($.isNode()) {
   cookiesArr = cookiesArr.filter(item => item !== "" && item !== null && item !== undefined);
 }
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
-const inviteCodes = [];
+const inviteCodes = [
+  `cgxZdTXtI72J4gbOXFGsvpY3gfrwL7rbUG0H2fJj98QLWJdBrnIE0owne1M@cgxZ-vU98xFEP6x13I4POIPr2JFAOUwXvQInTOld1UXFv-WeyhtO7QbBNAEGV6D8-a0sx2aJ6w`,
+  `cgxZdTXtI72J4gbOXFGsvpY3gfrwL7rbUG0H2fJj98QLWJdBrnIE0owne1M@cgxZ-vU98xFEP6x13I4POIPr2JFAOUwXvQInTOld1UXFv-WeyhtO7QbBNAEGV6D8-a0sx2aJ6w`
+];
 !(async () => {
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
@@ -69,6 +72,7 @@ const inviteCodes = [];
         }
         continue
       }
+      await shareCodesFormat();
       await jdNian()
     }
   }
@@ -93,6 +97,7 @@ async function jdNian() {
     await $.wait(1000)
     await doTask()
     await $.wait(2000)
+    await helpFriends()
     await $.wait(2000)
     await getHomeData(true)
     await showMsg()
@@ -126,7 +131,13 @@ function showMsg() {
     resolve()
   })
 }
-
+async function helpFriends() {
+  for (let code of $.newShareCodes) {
+    if (!code) continue
+    await getFriendData(code)
+    await $.wait(1000)
+  }
+}
 async function doTask() {
   for (let item of $.taskVos) {
     if (item.taskType === 14) {
@@ -470,7 +481,28 @@ function getTaskList(body={}) {
     })
   })
 }
-
+function getFriendData(inviteId) {
+  return new Promise((resolve) => {
+    $.post(taskPostUrl('nian_getHomeData',{"inviteId":inviteId}), async (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          data = JSON.parse(data);
+          if (data.data && data.data['bizCode'] === 0) {
+            $.itemId = data.data.result.homeMainInfo.guestInfo.itemId
+            await collectScore('2',$.itemId,null,inviteId)
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp);
+      } finally {
+        resolve();
+      }
+    })
+  })
+}
 function map() {
   return new Promise(resolve => {
     $.post(taskPostUrl("nian_myMap", {}, "nian_myMap"), async (err, resp, data) => {
@@ -782,6 +814,18 @@ function killCoupon(skuId) {
         resolve();
       }
     })
+  })
+}
+//格式化助力码
+function shareCodesFormat() {
+  return new Promise(async resolve => {
+    // console.log(`第${$.index}个京东账号的助力码:::${$.shareCodesArr[$.index - 1]}`)
+    $.newShareCodes = [];
+    console.log(`由于您第${$.index}个京东账号未提供shareCode,将采纳本脚本自带的助力码\n`)
+    const tempIndex = $.index > inviteCodes.length ? (inviteCodes.length - 1) : ($.index - 1);
+    $.newShareCodes = inviteCodes[tempIndex].split('@');
+    console.log(`第${$.index}个京东账号将要助力的好友${JSON.stringify($.newShareCodes)}`)
+    resolve();
   })
 }
 

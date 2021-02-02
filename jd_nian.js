@@ -2,24 +2,24 @@
 京东炸年兽🧨
 活动时间:2021-1-18至2021-2-11
 暂不加入品牌会员
-活动入口:https://wbbny.m.jd.com/babelDiy/Zeus/2cKMj86srRdhgWcKonfExzK4ZMBy/index.html
-活动地址：京东app左侧浮动窗口
+地址 https://wbbny.m.jd.com/babelDiy/Zeus/2cKMj86srRdhgWcKonfExzK4ZMBy/index.html
+活动入口：京东app首页浮动窗口
 已支持IOS双京东账号,Node.js支持N个京东账号
 脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
 ============Quantumultx===============
 [task_local]
 #京东炸年兽🧨
-0 9,12,20,21 * * * https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js, tag=京东炸年兽🧨, img-url=https://raw.githubusercontent.com/yogayyy/Scripts/main/Icon/lxk0301/jd_nian.png, enabled=true
+0 9,12,20,21 * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_nian.js, tag=京东炸年兽🧨, img-url=https://raw.githubusercontent.com/yogayyy/Scripts/main/Icon/lxk0301/jd_nian.png, enabled=true
 
 ================Loon==============
 [Script]
-cron "0 9,12,20,21 * * *" script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js,tag=京东炸年兽🧨
+cron "0 9,12,20,21 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_nian.js,tag=京东炸年兽🧨
 
 ===============Surge=================
-京东炸年兽🧨 = type=cron,cronexp="0 9,12,20,21 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js
+京东炸年兽🧨 = type=cron,cronexp="0 9,12,20,21 * * *",wake-system=1,timeout=3600,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_nian.js
 
 ============小火箭=========
-京东炸年兽🧨 = type=cron,script-path=https://raw.githubusercontent.com/LXK9301/jd_scripts/master/jd_nian.js, cronexpr="0 9,12,20,21 * * *", timeout=3600, enable=true
+京东炸年兽🧨 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_nian.js, cronexpr="0 9,12,20,21 * * *", timeout=3600, enable=true
  */
 const $ = new Env('京东炸年兽🧨');
 
@@ -50,8 +50,8 @@ const inviteCodes = [
   `cgxZdTXtI72J4gbOXFGsvpY3gfrwL7rbUG0H2fJj98QLWJdBrnIE0owne1M@cgxZ-vU98xFEP6x13I4POIPr2JFAOUwXvQInTOld1UXFv-WeyhtO7QbBNAEGV6D8-a0sx2aJ6w`
 ];
 const pkInviteCodes = [
-  `IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvHqSO0MVB1EXeVeXjK-6Ji_Fjinv@IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvPVS65NlHS7ZkB-YXUqQP0RhA_OmZhB_VVc`,
-  `IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvHqSO0MVB1EXeVeXjK-6Ji_Fjinv@IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvPVS65NlHS7ZkB-YXUqQP0RhA_OmZhB_VVc`
+  `IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvHqSO0MVB1EXeVeXjK-6Ji_Fjijq@IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvPVS65NlHS7ZkB-YXUqQP0RhA_OmZhB_VFI`,
+  `IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvHqSO0MVB1EXeVeXjK-6Ji_Fjijq@IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvPVS65NlHS7ZkB-YXUqQP0RhA_OmZhB_VFI`
 ]
 !(async () => {
   await requireConfig();
@@ -78,7 +78,7 @@ const pkInviteCodes = [
         continue
       }
       await shareCodesFormat();
-      await shareCodesFormatPk();
+      await shareCodesFormatPk()
       await jdNian()
     }
   }
@@ -119,7 +119,7 @@ async function jdNian() {
     await $.wait(1000)
     await doTask()
     await $.wait(2000)
-    // await helpFriends()
+    await helpFriends()
     await $.wait(2000)
     await getHomeData(true)
     await showMsg()
@@ -724,6 +724,20 @@ function shopLotteryInfo(shopSign) {
                         console.log(`${vo.taskName}已做完`)
                       }
                     }
+                  }else if (vo.taskType === 21) {
+                    if (vo.brandMemberVos) {
+                      if (vo.status === 1) {
+                        console.log(`准备做此任务：${vo.taskName}`)
+                        for (let task of vo.brandMemberVos) {
+                          if (task.status === 1) {
+                            await $.wait(2000)
+                            await collectScore(vo.taskId, task.advertId, null, null, shopSign);
+                          }
+                        }
+                      } else if (vo.status === 2) {
+                        console.log(`${vo.taskName}已做完`)
+                      }
+                    }
                   }
                 }
               }
@@ -761,6 +775,8 @@ function doShopLottery(shopSign) {
                 console.log(`抽奖成功，获得${result.score}爆竹🧨`)
               else if (result.awardType === 2 || result.awardType === 3)
                 console.log(`抽奖成功，获得优惠卷`)
+              else if (result.awardType === 5)
+                console.log(`抽奖成功，品牌卡`)
               else
                 console.log(`抽奖成功，获得${JSON.stringify(result)}`)
             } else {
@@ -789,8 +805,9 @@ function pkInfo() {
           if (safeGet(data)) {
             data = JSON.parse(data);
             if (data.code === 0 && data.data && data.data.bizCode === 0) {
-              console.log(`\n您的好友PK助力码为${data.data.result.groupInfo.groupAssistInviteId}\n`)
+              console.log(`\n您的好友PK助力码为${data.data.result.groupInfo.groupAssistInviteId}\n注：此pk邀请码每天都变！`)
               let info = data.data.result.groupPkInfo
+              console.log(`预计分得:${data.data.result.groupInfo.personalAward}红包`)
               if (info.dayAward)
                 console.log(`白天关卡：${info.dayAward}元红包，完成进度 ${info.dayTotalValue}/${info.dayTargetSell}`)
               else {
@@ -1048,6 +1065,62 @@ function killCoupon(skuId) {
   })
 }
 
+function readShareCode() {
+  console.log(`开始`)
+  return new Promise(async resolve => {
+    $.get({
+      url: `https://code.chiang.fun/api/v1/jd/jdnian/read/${randomCount}/`,
+      'timeout': 10000
+    }, (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          if (data) {
+            console.log(`随机取${randomCount}个码放到您固定的互助码后面(不影响已有固定互助)`)
+            data = JSON.parse(data);
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve(data);
+      }
+    })
+    await $.wait(10000);
+    resolve()
+  })
+}
+
+function readShareCodePk() {
+  console.log(`开始`)
+  return new Promise(async resolve => {
+    $.get({
+      url: `http://jd.turinglabs.net/api/v2/jd/nian/read/${randomCount}/`,
+      'timeout': 10000
+    }, (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          if (data) {
+            console.log(`随机取${randomCount}个PK助力码放到您固定的互助码后面(不影响已有固定互助)`)
+            data = JSON.parse(data);
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve(data);
+      }
+    })
+    await $.wait(10000);
+    resolve()
+  })
+}
+
 //格式化助力码
 function shareCodesFormat() {
   return new Promise(async resolve => {
@@ -1060,10 +1133,10 @@ function shareCodesFormat() {
       const tempIndex = $.index > inviteCodes.length ? (inviteCodes.length - 1) : ($.index - 1);
       $.newShareCodes = inviteCodes[tempIndex].split('@');
     }
-    // const readShareCodeRes = await readShareCode();
-    // if (readShareCodeRes && readShareCodeRes.code === 200) {
-    //   $.newShareCodes = [...new Set([...$.newShareCodes, ...(readShareCodeRes.data || [])])];
-    // }
+    const readShareCodeRes = null;//await readShareCode();
+    if (readShareCodeRes && readShareCodeRes.code === 200) {
+      $.newShareCodes = [...new Set([...$.newShareCodes, ...(readShareCodeRes.data || [])])];
+    }
     console.log(`第${$.index}个京东账号将要助力的好友${JSON.stringify($.newShareCodes)}`)
     resolve();
   })

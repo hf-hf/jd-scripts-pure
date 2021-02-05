@@ -53,6 +53,8 @@ const pkInviteCodes = [
   `IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvHqSO0MVB1EXeVeXjK-6Ji_Fjijq@IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvPVS65NlHS7ZkB-YXUqQP0RhA_OmZhB_VFI`,
   `IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvHqSO0MVB1EXeVeXjK-6Ji_Fjijq@IgNWdiLGaPaAvmHOD1ah53ZsQ5qinzo4G88QvPVS65NlHS7ZkB-YXUqQP0RhA_OmZhB_VFI`
 ]
+let nowTimes = new Date(new Date().getTime() + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000);
+const openUrl = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%20%22des%22:%20%22m%22,%20%22url%22:%20%22https://wbbny.m.jd.com/babelDiy/Zeus/2cKMj86srRdhgWcKonfExzK4ZMBy/index.html%22%20%7D`;
 !(async () => {
   await requireConfig();
   if (!cookiesArr[0]) {
@@ -92,7 +94,6 @@ const pkInviteCodes = [
       $.nickName = '';
       message = '';
       await TotalBean();
-      console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
       if (!$.isLogin) {
         $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
 
@@ -104,6 +105,16 @@ const pkInviteCodes = [
       await helpSuper()
     }
   }
+  if ((nowTimes.getHours() < 20 && nowTimes.getHours() >= 10) && nowTimes.getDate() === 4) {
+    if (nowTimes.getHours() === 12 || nowTimes.getHours() === 19) {
+      $.msg($.name, '', '队伍红包已可兑换\n点击弹窗直达兑换页面', { 'open-url' : openUrl});
+      if ($.isNode()) await notify.sendNotify($.name, `队伍PK红包已可兑换\n兑换地址: https://wbbny.m.jd.com/babelDiy/Zeus/2cKMj86srRdhgWcKonfExzK4ZMBy/index.html`)
+    }
+  }
+  if (nowTimes.getHours() === 20 && nowTimes.getDate() === 4) {
+    $.msg($.name, '', '年终奖红包已可兑换\n点击弹窗直达兑换页面', { 'open-url' : openUrl})
+    if ($.isNode()) await notify.sendNotify($.name, `年终奖红包已可兑换\n兑换地址: https://wbbny.m.jd.com/babelDiy/Zeus/2cKMj86srRdhgWcKonfExzK4ZMBy/index.html`)
+  }
 })()
   .catch((e) => {
     $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -114,23 +125,26 @@ const pkInviteCodes = [
 
 async function jdNian() {
   try {
+    $.full = false
     await getHomeData()
     if (!$.secretp) return
-    let hour = new Date().getUTCHours()
-    if (1 <= hour && hour < 12) {
-      // 北京时间9点-20点
-      $.hasGroup = false
-      await pkTaskDetail()
-      if ($.hasGroup) await pkInfo()
-      await helpFriendsPK()
-    }
-    if (12 <= hour && hour < 14) {
-      // 北京时间20点-22点
-      $.hasGroup = false
-      await pkTaskStealDetail()
-      if ($.hasGroup) await pkInfo()
-      await helpFriendsPK()
-    }
+    // 注释PK互助代码
+    // let hour = new Date().getUTCHours()
+    // if (1 <= hour && hour < 12) {
+    //   // 北京时间9点-20点
+    //   $.hasGroup = false
+    //   await pkTaskDetail()
+    //   if ($.hasGroup) await pkInfo()
+    //   await helpFriendsPK()
+    // }
+    // if (12 <= hour && hour < 14) {
+    //   // 北京时间20点-22点
+    //   $.hasGroup = false
+    //   await pkTaskStealDetail()
+    //   if ($.hasGroup) await pkInfo()
+    //   await helpFriendsPK()
+    // }
+    if($.full) return
     await $.wait(2000)
     await killCouponList()
     await $.wait(2000)
@@ -344,7 +358,12 @@ function getHomeData(info = false) {
               $.secretp = null
               return
             }
-            console.log(`\n\n当前等级:${$.userInfo.raiseInfo.curMaxLevel}\n当前爆竹${$.userInfo.raiseInfo.remainScore}🧨，下一关需要${$.userInfo.raiseInfo.nextLevelScore - $.userInfo.raiseInfo.curLevelStartScore}🧨\n\n`)
+            if ($.userInfo.raiseInfo.fullFlag) {
+              console.log(`当前等级已满，不再做日常任务！\n`)
+              $.full = true
+              return
+            }
+            console.log(`\n\n当前等级:${$.userInfo.raiseInfo.scoreLevel}\n当前爆竹${$.userInfo.raiseInfo.remainScore}🧨，下一关需要${$.userInfo.raiseInfo.nextLevelScore - $.userInfo.raiseInfo.curLevelStartScore}🧨\n\n`)
 
             if (info) {
               message += `当前爆竹${$.userInfo.raiseInfo.remainScore}🧨\n`

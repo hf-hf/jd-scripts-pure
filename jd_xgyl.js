@@ -1,7 +1,7 @@
 /*
 小鸽有礼2
 每天抽奖25豆
-活动入口：https://jingcai-h5.jd.com/#/dialTemplate?activityCode=1354740864131276800
+活动入口：https://jingcai-h5.jd.com/#/dialTemplate?activityCode=1354648125121241088
 活动时间：2021年1月28日～2021年2月28日
 更新地址：https://gitee.com/lxk0301/jd_scripts/raw/master/jd_xgyl.js
 
@@ -36,13 +36,7 @@ if ($.isNode()) {
   if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {
   };
 } else {
-  let cookiesData = $.getdata('CookiesJD') || "[]";
-  cookiesData = jsonParse(cookiesData);
-  cookiesArr = cookiesData.map(item => item.cookie);
-  cookiesArr.reverse();
-  cookiesArr.push(...[$.getdata('CookieJD2'), $.getdata('CookieJD')]);
-  cookiesArr.reverse();
-  cookiesArr = cookiesArr.filter(item => item !== "" && item !== null && item !== undefined);
+  cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 
 !(async () => {
@@ -250,7 +244,7 @@ function draw() {
 function taskUrl(function_id, body) {
   return {
     url: `https://lop-proxy.jd.com/${function_id}`,
-    body: JSON.stringify([{"userNo": "$cooMrdGatewayUid$", "activityCode": "1354740864131276800", ...body}]),
+    body: JSON.stringify([{"userNo": "$cooMrdGatewayUid$", "activityCode": "1354648125121241088", ...body}]),
     headers: {
       'Host': 'lop-proxy.jd.com',
       'lop-dn': 'jingcai.jd.com',
@@ -304,7 +298,11 @@ function TotalBean() {
               $.isLogin = false; //cookie过期
               return
             }
-            $.nickName = data['base'].nickname;
+            if (data['retcode'] === 0) {
+              $.nickName = data['base'].nickname;
+            } else {
+              $.nickName = $.UserName
+            }
           } else {
             console.log(`京东服务器返回空数据`)
           }

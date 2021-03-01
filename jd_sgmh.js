@@ -10,7 +10,7 @@
 ============Quantumultx===============
 [task_local]
 #闪购盲盒
-20 8 * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_sgmh.js, tag=闪购盲盒, img-url=https://raw.githubusercontent.com/Orz-3/task/master/jd.png, enabled=true
+20 8 * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_sgmh.js, tag=闪购盲盒, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 
 ================Loon==============
 [Script]
@@ -26,9 +26,12 @@ cron "20 8 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd
 const $ = new Env('闪购盲盒');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let appId = '1EFRRxA' , homeDataFunPrefix = '_template', collectScoreFunPrefix = 'harmony', message = ''
+let appId = '1EFRXxg' , homeDataFunPrefix = 'interact_template', collectScoreFunPrefix = 'harmony', message = ''
 let lotteryResultFunPrefix = homeDataFunPrefix, browseTime = 6
-const inviteCodes = [];
+const inviteCodes = [
+  'T0225KkcRxlK_VzQdE7xxaRfJwCjVQmoaT5kRrbA@T028a2nMl7WHIPZr9JFSQ12-oR9hQlfRCjVQmoaT5kRrbA',
+  'T0225KkcRxlK_VzQdE7xxaRfJwCjVQmoaT5kRrbA@T028a2nMl7WHIPZr9JFSQ12-oR9hQlfRCjVQmoaT5kRrbA',
+];
 const randomCount = $.isNode() ? 20 : 5;
 const notify = $.isNode() ? require('./sendNotify') : '';
 let merge = {}
@@ -40,13 +43,7 @@ if ($.isNode()) {
   })
   if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
 } else {
-  let cookiesData = $.getdata('CookiesJD') || "[]";
-  cookiesData = jsonParse(cookiesData);
-  cookiesArr = cookiesData.map(item => item.cookie);
-  cookiesArr.reverse();
-  cookiesArr.push(...[$.getdata('CookieJD2'), $.getdata('CookieJD')]);
-  cookiesArr.reverse();
-  cookiesArr = cookiesArr.filter(item => item !== "" && item !== null && item !== undefined);
+  cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
@@ -76,7 +73,7 @@ const JD_API_HOST = `https://api.m.jd.com/client.action`;
         }
         continue
       }
-      await _template_getHomeData()
+      await interact_template_getHomeData()
       await showMsg();
     }
   }
@@ -84,7 +81,7 @@ const JD_API_HOST = `https://api.m.jd.com/client.action`;
   .catch((e) => $.logErr(e))
   .finally(() => $.done())
 //获取活动信息
-function _template_getHomeData(timeout = 0) {
+function interact_template_getHomeData(timeout = 0) {
   return new Promise((resolve) => {
     setTimeout( ()=>{
       let url = {
@@ -107,8 +104,6 @@ function _template_getHomeData(timeout = 0) {
           data = JSON.parse(data);
           if (data.data.bizCode !== 0) {
             console.log(data.data.bizMsg);
-            merge.jdBeans.fail++;
-            merge.jdBeans.notify = `${data.data.bizMsg}`;
             return
           }
           scorePerLottery = data.data.result.userInfo.scorePerLottery||data.data.result.userInfo.lotteryMinusScore
@@ -117,7 +112,7 @@ function _template_getHomeData(timeout = 0) {
           for (let i = 0;i < data.data.result.taskVos.length;i ++) {
             console.log("\n" + data.data.result.taskVos[i].taskType + '-' + data.data.result.taskVos[i].taskName  + '-' + (data.data.result.taskVos[i].status === 1 ? `已完成${data.data.result.taskVos[i].times}-未完成${data.data.result.taskVos[i].maxTimes}` : "全部已完成"))
             //签到
-            if (data.data.result.taskVos[i].taskName === '邀人助力任务') {
+            if (data.data.result.taskVos[i].taskName === '邀请好友助力') {
               console.log(`您的好友助力码为:${data.data.result.taskVos[i].assistTaskDetailVo.taskToken}`)
               for (let code of $.newShareCodes) {
                 if (!code) continue
@@ -127,7 +122,7 @@ function _template_getHomeData(timeout = 0) {
             }
             else if (data.data.result.taskVos[i].status === 3) {
               console.log('开始抽奖')
-              await _template_getLotteryResult(data.data.result.taskVos[i].taskId);
+              await interact_template_getLotteryResult(data.data.result.taskVos[i].taskId);
             }
             else if ([0,13].includes(data.data.result.taskVos[i].taskType)) {
               if (data.data.result.taskVos[i].status === 1) {
@@ -140,7 +135,7 @@ function _template_getHomeData(timeout = 0) {
                 if (appId === "1EFRTxQ") {
                   await ts_smashGoldenEggs()
                 }  else {
-                  await _template_getLotteryResult(data.data.result.taskVos[i].taskId);
+                  await interact_template_getLotteryResult(data.data.result.taskVos[i].taskId);
                 }
               }
             }
@@ -153,7 +148,7 @@ function _template_getHomeData(timeout = 0) {
                   //console.log(list[j].itemId)
                   if (list[j].itemId) {
                     await harmony_collectScore(list[j].taskToken,data.data.result.taskVos[i].taskId,list[j].itemId,1);
-                    if (k === data.data.result.taskVos[i].maxTimes - 1) await _template_getLotteryResult(data.data.result.taskVos[i].taskId);
+                    if (k === data.data.result.taskVos[i].maxTimes - 1) await interact_template_getLotteryResult(data.data.result.taskVos[i].taskId);
                   } else {
                     await harmony_collectScore(list[j].taskToken,data.data.result.taskVos[i].taskId)
                   }
@@ -163,7 +158,7 @@ function _template_getHomeData(timeout = 0) {
               }
             }
           }
-          if (scorePerLottery) await _template_getLotteryResult();
+          if (scorePerLottery) await interact_template_getLotteryResult();
         } catch (e) {
           $.logErr(e, resp);
         } finally {
@@ -211,7 +206,7 @@ function harmony_collectScore(taskToken,taskId,itemId = "",actionType = 0,timeou
   })
 }
 //抽奖
-function _template_getLotteryResult(taskId,timeout = 0) {
+function interact_template_getLotteryResult(taskId,timeout = 0) {
   return new Promise((resolve) => {
     setTimeout( ()=>{
       let url = {
@@ -241,7 +236,7 @@ function _template_getLotteryResult(taskId,timeout = 0) {
             }
             if (data.data.result.raiseInfo) scorePerLottery = parseInt(data.data.result.raiseInfo.nextLevelScore);
             if (parseInt(data.data.result.userScore) >= scorePerLottery && scorePerLottery) {
-              await _template_getLotteryResult(1000)
+              await interact_template_getLotteryResult(1000)
             }
           }
         } catch (e) {
@@ -259,7 +254,8 @@ function _template_getLotteryResult(taskId,timeout = 0) {
 function showMsg() {
   message += `任务已完成，本次运行获得京豆${$.beans}`
   return new Promise(resolve => {
-    $.msg($.name, '', `【京东账号${$.index}】${$.nickName}\n${message}`);
+    if ($.beans) $.msg($.name, '', `【京东账号${$.index}】${$.nickName}\n${message}`);
+    $.log(`【京东账号${$.index}】${$.nickName}\n${message}`);
     resolve()
   })
 }
@@ -368,7 +364,11 @@ function TotalBean() {
               $.isLogin = false; //cookie过期
               return
             }
-            $.nickName = data['base'].nickname;
+            if (data['retcode'] === 0) {
+              $.nickName = data['base'].nickname;
+            } else {
+              $.nickName = $.UserName
+            }
           } else {
             console.log(`京东服务器返回空数据`)
           }

@@ -10,6 +10,7 @@
 let FruitShareCodes = [
   'b36ac11ca008494495ba048e98228edf',//账号一的好友shareCode,不同好友中间用@符号隔开
   '7bfa18c6b08843f3adac7ee4b097a72e',//账号二的好友shareCode，不同好友中间用@符号隔开
+  'fda25f351508448286f092d15a14ec98',
 ]
 // 判断github action里面是否有水果互助码
 if (process.env.FRUITSHARECODES) {

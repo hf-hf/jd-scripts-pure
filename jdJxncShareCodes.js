@@ -13,8 +13,9 @@
 // 每个账号 shareCdoe 是一个 json，示例如下
 // {"smp":"22bdadsfaadsfadse8a","active":"jdnc_1_btorange210113_2","joinnum":"1"}
 let JxncShareCodes = [
-  '',//账号一的好友shareCode,不同好友中间用@符号隔开
-  '',//账号二的好友shareCode，不同好友中间用@符号隔开
+  '{"smp":"2c6ca416066f8d4c2e95b56e57bd1fbe","active":"jdnc_1_1yuanguazi210305_2","joinnum":1}@{"smp":"bfea2fe586d0a7c9f6b47f03df48776c","active":"jdnc_1_cphuasheng210305_2","joinnum":1}@{"smp":"437424449b426d770e8e099ad390a973","active":"jdnc_1_cphuasheng210305_2","joinnum":1}',//账号一的好友shareCode,不同好友中间用@符号隔开
+  '{"smp":"2c6ca416066f8d4c2e95b56e57bd1fbe","active":"jdnc_1_1yuanguazi210305_2","joinnum":1}@{"smp":"bfea2fe586d0a7c9f6b47f03df48776c","active":"jdnc_1_cphuasheng210305_2","joinnum":1}@{"smp":"437424449b426d770e8e099ad390a973","active":"jdnc_1_cphuasheng210305_2","joinnum":1}',//账号二的好友shareCode，不同好友中间用@符号隔开
+  '{"smp":"2c6ca416066f8d4c2e95b56e57bd1fbe","active":"jdnc_1_1yuanguazi210305_2","joinnum":1}@{"smp":"bfea2fe586d0a7c9f6b47f03df48776c","active":"jdnc_1_cphuasheng210305_2","joinnum":1}@{"smp":"437424449b426d770e8e099ad390a973","active":"jdnc_1_cphuasheng210305_2","joinnum":1}',//账号三的好友shareCode，不同好友中间用@符号隔开
 ]
 // 判断github action里面是否有京喜农场助力码
 if (process.env.JXNC_SHARECODES) {

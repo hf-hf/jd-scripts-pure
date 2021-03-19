@@ -4,7 +4,7 @@ const $ = new Env();
 //此处填你申请的SCKEY.
 //注：此处设置github action用户填写到Settings-Secrets里面(Name输入PUSH_KEY)
 //let SCKEY = 'SCU50818Tc610545f87933db9658e35bf277a079d5cd140740d729';
-let SCKEY = 'SCT18113THx7luHxwjwCQyhNs0lGCd2zj';
+let SCKEY = '';
 
 // =======================================Bark App通知设置区域===========================================
 //此处填你BarkAPP的信息(IP/设备码，例如：https://api.day.app/XXXXXXXX)
@@ -26,9 +26,9 @@ let TG_USER_ID = '';
 // =======================================钉钉机器人通知设置区域===========================================
 //此处填你钉钉 bot 的webhook，例如：5a544165465465645d0f31dca676e7bd07415asdasd
 //注：此处设置github action用户填写到Settings-Secrets里面(Name输入DD_BOT_TOKEN)
-let DD_BOT_TOKEN = '';
+let DD_BOT_TOKEN = 'd3d1eb28e59bb803e6f926bab75fe58148d7646b2b1ad3dcb3fdd207bbc66a5b';
 //密钥，机器人安全设置页面，加签一栏下面显示的SEC开头的字符串
-let DD_BOT_SECRET = '';
+let DD_BOT_SECRET = 'SEC82e8f42cb3d681c652ee0f361231ae26ca28aad5179874c0fe8367659e6e6b06';
 
 // =======================================iGot聚合推送通知设置区域===========================================
 //此处填您iGot的信息(推送key，例如：https://push.hellyw.com/XXXXXXXX)
@@ -210,7 +210,7 @@ function ddBotNotify(text, desp) {
       json: {
         "msgtype": "text",
         "text": {
-          "content": ` ${text.match(/.*?(?=\s?-)/g) && text.match(/.*?(?=\s?-)/g)[0]}\n\n${desp}`
+          "content": `京东小助手 ${text.match(/.*?(?=\s?-)/g) && text.match(/.*?(?=\s?-)/g)[0]}\n\n${desp}`
         }
       },
       headers: {

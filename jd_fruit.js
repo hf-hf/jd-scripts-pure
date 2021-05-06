@@ -781,6 +781,12 @@ async function clockInIn() {
 }
 //
 async function getAwardInviteFriend() {
+  // 添加远程好友，并邀请好友
+  const readShareCodeRes = await readShareCode();
+  if (readShareCodeRes && readShareCodeRes.code === 200) {
+    // newShareCodes = newShareCodes.concat(readShareCodeRes.data || []);
+    newShareCodes = [...new Set([...newShareCodes, ...(readShareCodeRes.data || [])])];
+  }
   await friendListInitForFarm();//查询好友列表
   // console.log(`查询好友列表数据：${JSON.stringify($.friendList)}\n`)
   if ($.friendList) {
@@ -1282,11 +1288,11 @@ function shareCodesFormat() {
       const tempIndex = $.index > shareCodes.length ? (shareCodes.length - 1) : ($.index - 1);
       newShareCodes = shareCodes[tempIndex].split('@');
     }
-    const readShareCodeRes = await readShareCode();
-    if (readShareCodeRes && readShareCodeRes.code === 200) {
-      // newShareCodes = newShareCodes.concat(readShareCodeRes.data || []);
-      newShareCodes = [...new Set([...newShareCodes, ...(readShareCodeRes.data || [])])];
-    }
+    // const readShareCodeRes = await readShareCode();
+    // if (readShareCodeRes && readShareCodeRes.code === 200) {
+    //   // newShareCodes = newShareCodes.concat(readShareCodeRes.data || []);
+    //   newShareCodes = [...new Set([...newShareCodes, ...(readShareCodeRes.data || [])])];
+    // }
     console.log(`第${$.index}个京东账号将要助力的好友${JSON.stringify(newShareCodes)}`)
     resolve();
   })

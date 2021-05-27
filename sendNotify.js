@@ -210,7 +210,7 @@ function ddBotNotify(text, desp) {
       json: {
         "msgtype": "text",
         "text": {
-          "content": `京东小助手 ${text.match(/.*?(?=\s?-)/g) && text.match(/.*?(?=\s?-)/g)[0]}\n\n${desp}`
+          "content": `京东小助手 ${text}\n\n${desp}`
         }
       },
       headers: {

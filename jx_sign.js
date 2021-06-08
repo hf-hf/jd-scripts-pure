@@ -117,7 +117,7 @@ function getTaskList() {
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
-            if(data.retCode ===0){
+            if(data.retCode ===0 && data.data.tasks != undefined){
               for (task of data.data.tasks) {
                 if(task.taskState===1){
                   console.log(`去做${task.taskName}任务`)

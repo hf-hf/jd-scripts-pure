@@ -1,26 +1,22 @@
 /*
 京享值PK
 cron 15 0,6,13,19,21 * * * ddo_pk.js
-更新时间：2021-6-4
+更新时间：2021-6-7
 活动入口：京东APP-我的-京享值
-
 已支持IOS双京东账号,Node.js支持N个京东账号
 脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
 ============Quantumultx===============
 [task_local]
-#京喜财富岛
+#京享值PK
 15 0,6,13,19,21 * * * https://raw.githubusercontent.com/hyzaw/scripts/main/ddo_pk.js, tag=京享值PK
-
 ================Loon==============
 [Script]
 cron "15 0,6,13,19,21 * * *" script-path=https://raw.githubusercontent.com/hyzaw/scripts/main/ddo_pk.js,tag=京享值PK
-
 ===============Surge=================
 京享值PK = type=cron,cronexp="15 0,6,13,19,21 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/hyzaw/scripts/main/ddo_pk.js
-
 ============小火箭=========
 京享值PK = type=cron,script-path=https://raw.githubusercontent.com/hyzaw/scripts/main/ddo_pk.js, cronexpr="15 0,6,13,19,21 * * *", timeout=3600, enable=true
- */
+*/
 const $ = new Env('京享值PK');
 $.toObj = (t, e = null) => {
 	try {
@@ -43,6 +39,7 @@ let cookiesArr = [],
 	cookie = "",
 	message;
 let minPrize = 1;
+let bcomplate = false;
 
 if ($.isNode()) {
 	Object.keys(jdCookieNode).forEach((item) => {
@@ -112,6 +109,10 @@ async function main() {
 		if($.pinList){
 			console.log($.pinList)
 			for(let i = 0; i < $.pinList.length ; i++){
+				if(bcomplate){
+					break;
+				}
+				else{
 					let pin = $.pinList[i];
 					console.log('别人的的pin：' + pin)
 					let fscore=await getScore(pin);
@@ -119,8 +120,12 @@ async function main() {
 					if(fscore<myScore){
 						await launchBattle(pin);
 						await receiveBattle(pin);
-					}
+					}					
+					
+				}
+		
 			}
+			bcomplate =false;
 		}
 
 		await getBoxRewardInfo();
@@ -142,7 +147,14 @@ function submitPKCode (pin) {
 	console.log(`上传pk码: ${pin}`);
 	return new Promise((resolve) => {
 		let options = {
-			"url": `https://pool.nz.lu/upload/PKv2/${pin}`,
+			"url": `https://pool.nz.lu/api/v2/upload?name=PK&code=${pin}`,
+			"headers": {
+				"Host": "pool.nz.lu",
+				"Connection": "keep-alive",
+				"Accept": " */*",
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4433.0 Safari/537.36",
+				"Accept-Language": "zh-cn",
+			}
 		}
 
 		$.get(options, (err, resp, res) => {
@@ -163,14 +175,21 @@ function getPinList(num = 20){
 	console.log("获取Pk列表");
 	return new Promise((resolve) => {
 		let options = {
-			"url": `https://pool.nz.lu/get/PKv2/${num}`,
+			"url": `https://pool.nz.lu/api/v2/get?name=PK&count=${num}`,
+			"headers": {
+				"Host": "pool.nz.lu",
+				"Connection": "keep-alive",
+				"Accept": " */*",
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4433.0 Safari/537.36",
+				"Accept-Language": "zh-cn",
+			}
 		}
 
 		$.get(options, (err, resp, res) => {
 			try {
 				if (res) {
 					let data = $.toObj(res);
-					$.pinList = data.data.split(',');
+					$.pinList = data.data;
 				}
 			} catch (e) {
 				console.log(e);
@@ -208,6 +227,9 @@ function launchBattle(fpin) {
 						data=data.data;
 						if(data.msg){
 						    console.log(data.msg);
+							if(data.msg =="今日次数已耗尽"){
+							bcomplate=true;
+							}
 						}else{
 						     console.log($.toStr(data));
 						}
@@ -246,7 +268,7 @@ function getScore(fpin){
 				if (res) {
 					let data = $.toObj(res);
 					if (data) {
-					    score = data.data
+					    score = data.data;
 					}
 				}
 			} catch (e) {

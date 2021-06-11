@@ -104,7 +104,7 @@ async function main() {
 		}
 		await getPinList(30); // 获取的pin列表
 		let myScore=await getScore($.pin);
-		await submitPKCode($.pin)
+		//await submitPKCode($.pin)
 		console.log("我的京享值:"+myScore);
 		if($.pinList){
 			console.log($.pinList)
@@ -173,31 +173,75 @@ function submitPKCode (pin) {
 
 function getPinList(num = 20){
 	console.log("获取Pk列表");
-	return new Promise((resolve) => {
-		let options = {
-			"url": `https://pool.nz.lu/api/v2/get?name=PK&count=${num}`,
-			"headers": {
-				"Host": "pool.nz.lu",
-				"Connection": "keep-alive",
-				"Accept": " */*",
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4433.0 Safari/537.36",
-				"Accept-Language": "zh-cn",
-			}
-		}
+	$.pinList = [
+		'7b289f81cdaff544aebb738028e5156d0f296a206a12473f57d63d95f3be0534',
+		'81786d4f5585de3dd3b5067ae3383f7d',
+		'd56e56493294aea844374d951771fb2f0f296a206a12473f57d63d95f3be0534',
+		'4cb937b61c85ae05473ef428c53e50740f296a206a12473f57d63d95f3be0534',
+		'1e19cc8b805e384bd20d0a41aece23b7',
+		'be14fbf7aa2f6037a079de577bf2fa7f',
+		'b6aa8ced25f4c66d0aa2238bc3767e540f296a206a12473f57d63d95f3be0534',
+		'1e6a808d10a40f65baf42719daec82720f296a206a12473f57d63d95f3be0534',
+		'24c9c4ba63249791c19279556d899f9d',
+		'a89662e114d08d872f9958619f57b71c',
+		'493baccfa14fdd9026d4b8529fe1b3f70f296a206a12473f57d63d95f3be0534',
+		'bacf49deabf237c0e17f7482d521f56c',
+		'e0cde915ac74d35992b7af9ddf6095ae',
+		'7699683946d8d01a898813309b74aaa0',
+		'7957b947efdf490c7e278beca60a41fb0f296a206a12473f57d63d95f3be0534',
+		'5a88a877ee765ed5a95f1c7d0f3e55f90f296a206a12473f57d63d95f3be0534',
+		'b12f7df2eed88805c3ebf5c3fea44de30f296a206a12473f57d63d95f3be0534',
+		'8125989616ad19dbd504fee9d87efd570f296a206a12473f57d63d95f3be0534',
+		'02e5a83ec654352e8e05d029a8102bc30f296a206a12473f57d63d95f3be0534',
+		'a4259fe6d9ade7f3e4c9501cbe46578d',
+		'c9244b41f976ab2f3d392fb4e7af05bb',
+		'9c1f85f26f6f25425b7e6e31e4692c7a',
+		'a2de9eed544cc3a74f1ca1459083d2c4',
+		'088a3b4681ef93174119adbd5e6db3d0',
+		'bfc447fa451aafac57bed2ac147525ff',
+		'118043f42e7813ebdf73b7f5cb5f9923',
+		'3e8ce8ee96d87bb3ff0a5badd71b1cc3',
+		'1cd7801acee0013b3b2f595f7c327c440f296a206a12473f57d63d95f3be0534',
+		'5fdfa59a70d07f740f51c7ecdc4bb5cd',
+		'77aec4d3a8296208f827778c6184585c',
+		'810716372d6753254ae841aad43b4e56',
+		'dfd9b395c58d7cc3b2e5b21fa78e663d',
+		'f702cf7bcfb9780f202df76d0b569ca4',
+		'73b0f38bc4ce40908df09d1ba5f0297e0f296a206a12473f57d63d95f3be0534',
+		'07b805aa119974c229c2b8d3a36d0c3b0f296a206a12473f57d63d95f3be0534',
+		'5c33b80fb74eee1d2be1fbe7697c5ce40f296a206a12473f57d63d95f3be0534',
+		'57f7894bdc8d5f1b518df30c97c0380d0f296a206a12473f57d63d95f3be0534',
+		'25ea8e68b820892babaaf2c5d26a281b0f296a206a12473f57d63d95f3be0534',
+		'cd25cafa4daa8b9b761eb162a86a177c',
+		'13be837532512709c45bd240be75f587',
+		'1e26e16ea12e634240d5d564d063c339',
+	  ]
+	  return;
+	// return new Promise((resolve) => {
+	// 	let options = {
+	// 		"url": `https://pool.nz.lu/api/v2/get?name=PK&count=${num}`,
+	// 		"headers": {
+	// 			"Host": "pool.nz.lu",
+	// 			"Connection": "keep-alive",
+	// 			"Accept": " */*",
+	// 			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4433.0 Safari/537.36",
+	// 			"Accept-Language": "zh-cn",
+	// 		}
+	// 	}
 
-		$.get(options, (err, resp, res) => {
-			try {
-				if (res) {
-					let data = $.toObj(res);
-					$.pinList = data.data;
-				}
-			} catch (e) {
-				console.log(e);
-			} finally {
-				resolve(res);
-			}
-		})
-	});
+	// 	$.get(options, (err, resp, res) => {
+	// 		try {
+	// 			if (res) {
+	// 				let data = $.toObj(res);
+	// 				$.pinList = data.data;
+	// 			}
+	// 		} catch (e) {
+	// 			console.log(e);
+	// 		} finally {
+	// 			resolve(res);
+	// 		}
+	// 	})
+	// });
 }
 
 

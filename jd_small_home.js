@@ -1,11 +1,6 @@
 /*
- * @Author: LXK9301 https://github.com/LXK9301
- * @Date: 2020-11-12 11:42:12 
- * @Last Modified by: LXK9301
- * @Last Modified time: 2021-1-22 14:27:20
- */
-/*
 东东小窝 https://gitee.com/lxk0301/jd_scripts/raw/master/jd_small_home.js
+Last Modified time: 2021-1-22 14:27:20
 现有功能：
 做日常任务任务，每日抽奖（有机会活动京豆，使用的是免费机会，不消耗WO币）
 自动使用WO币购买装饰品可以获得京豆，分别可获得5,20，50,100,200,400,700，1200京豆）
@@ -82,19 +77,7 @@ const JD_API_HOST = 'https://lkyl.dianpusoft.cn/api';
       await smallHome();
     }
   }
-  for (let i = 0; i < cookiesArr.length; i++) {
-    if (cookiesArr[i]) {
-      cookie = cookiesArr[i];
-      $.token = $.helpToken[i];
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-      if ($.newShareCodes.length > 1) {
-        console.log('----', (i + 1) % $.newShareCodes.length)
-        let code = $.newShareCodes[(i + 1) % $.newShareCodes.length]['code']
-        console.log(`\n${$.UserName} 去给自己的下一账号 ${decodeURIComponent($.newShareCodes[(i + 1) % $.newShareCodes.length]['cookie'].match(/pt_pin=([^; ]+)(?=;?)/) && $.newShareCodes[(i + 1) % $.newShareCodes.length]['cookie'].match(/pt_pin=([^; ]+)(?=;?)/)[1])}助力，助力码为 ${code}\n`)
-        await createAssistUser(code, $.createAssistUserID);
-      }
-    }
-  }
+
 })()
     .catch((e) => {
       $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -105,6 +88,7 @@ const JD_API_HOST = 'https://lkyl.dianpusoft.cn/api';
 async function smallHome() {
   await loginHome();
   await ssjjRooms();
+  // await helpFriends();
   if (!$.isUnLock) return;
   await createInviteUser();
   await queryDraw();
@@ -135,6 +119,16 @@ async function doChannelsListTask(taskId, taskType) {
       await $.wait(1000)
       await followChannel(taskId, item.id)
       await queryDoneTaskRecord(taskId, taskType);
+    }
+  }
+}
+async function helpFriends() {
+
+ 
+  if ($.inviteCodes && $.inviteCodes['inviteCode']) {
+    for (let item of $.inviteCodes.inviteCode) {
+      if (!item) continue
+      await createAssistUser(item, $.createAssistUserID);
     }
   }
 }
@@ -784,26 +778,7 @@ function updateInviteCode(url = 'https://raw.githubusercontent.com/LXK9301/updat
     })
   })
 }
-function updateInviteCodeCDN(url) {
-  return new Promise(async resolve => {
-    $.get({url, headers:{"User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")}, timeout: 200000}, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          $.inviteCodes = JSON.parse(data);
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-    await $.wait(3000)
-    resolve();
-  })
-}
+
 function taskUrl(url, body = {}) {
   return {
     url: `${JD_API_HOST}/${url}?body=${escape(body)}`,

@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/jd_crazy_joy.js",
+            "program": "${workspaceFolder}/jd_small_home.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]

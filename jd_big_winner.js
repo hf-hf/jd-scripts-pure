@@ -100,7 +100,7 @@ function gambleHomePage() {
     'Host': 'api.m.jd.com',
     'Origin': 'https://openredpacket-jdlite.jd.com',
     'Accept': 'application/json, text/plain, */*',
-    'User-Agent': 'jdltapp;iPhone;3.3.2;14.4.1;network/wifi;Mozilla/5.0 (iPhone; CPU iPhone OS 14_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1',
+    'User-Agent': 'jdapp;android;10.0.2;10;network/wifi;Mozilla/5.0 (Linux; Android 10; LYA-AL00 Build/HUAWEILYA-AL00L; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045230 Mobile Safari/537.36',
     'Referer': `https://618redpacket.jd.com/withdraw?activityId=${linkId}&channel=wjicon&lng=&lat=&sid=&un_area=`,
     'Accept-Language': 'zh-cn',
     'Cookie': cookie

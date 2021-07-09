@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/dyj.js",
+            "program": "${workspaceFolder}/jd_sendBeans.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]

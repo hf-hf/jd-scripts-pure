@@ -51,15 +51,18 @@ const UA = $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT :
   console.log('活动入口：京东APP-》 首页-》 右边小窗口（点我赢千元）\n' +
       'SH互助：内部账号自行互助(排名靠前账号得到的机会多),多余的助力次数会默认助力作者内置助力码\n' +
       '本脚本只助力SH\n' +
+      '百元守卫战 开启时间早上8点过后\n' +
       '活动时间：2021-07-08至2021-08-08\n' +
       '脚本更新时间：2021年7月9日 9点00分\n'
       );
       if(Number(summer_movement_ShHelpFlag) === 1){
-        console.log('您设置了 【百元守卫站SH】✅ || 互助✅')
+        console.log('您设置了 【百元守卫战SH】✅ || 互助✅')
       }else if(Number(summer_movement_ShHelpFlag) === 2){
-        console.log('您设置了 【百元守卫站SH】✅ || 互助❌')
+        console.log('您设置了 【百元守卫战SH】✅ || 互助❌')
       }else if(Number(summer_movement_ShHelpFlag) === 0){
-        console.log('您设置了 【百元守卫站SH】❌ || 互助❌')
+        console.log('您设置了 【百元守卫战SH】❌ || 互助❌')
+      }else{
+        console.log('原 summer_movement_ShHelpFlag 变量不兼容请修改 0不开启也不助力 1开启并助力 2开启但不助力')
       }
 
   for (let i = 0; i < cookiesArr.length; i++) {
@@ -92,9 +95,9 @@ const UA = $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT :
     // }
     // $.secretp = $.secretpInfo[$.UserName];
     $.index = i + 1;
-    if (new Date().getUTCHours() + 8 >= 9) {
+    if (new Date().getUTCHours() + 8 >= 8) {
       if(Number(summer_movement_ShHelpFlag) === 1){
-        if ($.ShInviteList && $.ShInviteList.length) console.log(`\n******开始内部京东账号【百元守卫站SH】助力*********\n`);
+        if ($.ShInviteList && $.ShInviteList.length) console.log(`\n******开始内部京东账号【百元守卫战SH】助力*********\n`);
         for (let i = 0; i < $.ShInviteList.length && $.canHelp; i++) {
           console.log(`${$.UserName} 去助力SH码 ${$.ShInviteList[i]}`);
           $.inviteId = $.ShInviteList[i];
@@ -124,16 +127,20 @@ async function movement() {
     $.taskList = [];
     $.shopSign = ``;
     $.userInfo = ''
-    if(Number(summer_movement_ShHelpFlag) === 1 || Number(summer_movement_ShHelpFlag) === 2){
-      $.Shend = false
-      await $.wait(1000);
-      console.log('\n百元守卫站')
-      await takePostRequest('olypicgames_guradHome');
-      await $.wait(1000);
-      if($.Shend){
-        await takePostRequest('olympicgames_receiveCash');
+    if (new Date().getUTCHours() + 8 >= 8) {
+      console.log('\n百元守卫战')
+      if(Number(summer_movement_ShHelpFlag) === 1 || Number(summer_movement_ShHelpFlag) === 2){
+        $.Shend = false
         await $.wait(1000);
+        await takePostRequest('olypicgames_guradHome');
+        await $.wait(1000);
+        if($.Shend){
+          await takePostRequest('olympicgames_receiveCash');
+          await $.wait(1000);
+        }
       }
+    }else{
+      console.log('\n百元守卫战开启时间还没到')
     }
     
   } catch (e) {

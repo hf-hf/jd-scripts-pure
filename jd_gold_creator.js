@@ -7,17 +7,17 @@
 ===================quantumultx================
 [task_local]
 #金榜创造营
-13 1,22 * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_gold_creator.js, tag=金榜创造营, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
+13 1,22 * * * jd_gold_creator.js, tag=金榜创造营, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 
 =====================Loon================
 [Script]
-cron "13 1,22 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_gold_creator.js, tag=金榜创造营
+cron "13 1,22 * * *" script-path=jd_gold_creator.js, tag=金榜创造营
 
 ====================Surge================
-金榜创造营 = type=cron,cronexp="13 1,22 * * *",wake-system=1,timeout=3600,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_gold_creator.js
+金榜创造营 = type=cron,cronexp="13 1,22 * * *",wake-system=1,timeout=3600,script-path=jd_gold_creator.js
 
 ============小火箭=========
-金榜创造营 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_gold_creator.js, cronexpr="13 1,22 * * *", timeout=3600, enable=true
+金榜创造营 = type=cron,script-path=jd_gold_creator.js, cronexpr="13 1,22 * * *", timeout=3600, enable=true
  */
 const $ = new Env('金榜创造营');
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -103,6 +103,7 @@ async function getDetail() {
   }
 }
 function goldCreatorTab() {
+  $.subTitleInfos = [];
   return new Promise(resolve => {
     const body = {"subTitleId":"","isPrivateVote":"0"};
     const options = taskUrl('goldCreatorTab', body)
@@ -115,7 +116,7 @@ function goldCreatorTab() {
           if (safeGet(data)) {
             data = JSON.parse(data)
             if (data.code === '0') {
-              $.subTitleInfos = data.result.subTitleInfos;
+              $.subTitleInfos = data.result.subTitleInfos || [];
               let unVoted = $.subTitleInfos.length
               console.log(`共有${$.subTitleInfos.length}个主题`);
               $.stageId = data.result.mainTitleHeadInfo.stageId;
@@ -123,6 +124,8 @@ function goldCreatorTab() {
               await goldCreatorDetail($.subTitleInfos[0]['matGrpId'], $.subTitleInfos[0]['subTitleId'], $.subTitleInfos[0]['taskId'], $.subTitleInfos[0]['batchId'], true);
               $.subTitleInfos = $.subTitleInfos.filter(vo => !!vo && vo['hasVoted'] === '0');
               console.log(`已投票${unVoted - $.subTitleInfos.length}主题\n`);
+            } else {
+              console.log(`goldCreatorTab 异常：${JSON.stringify(data)}`)
             }
           }
         }
@@ -136,6 +139,9 @@ function goldCreatorTab() {
 }
 //获取每个主题下面待投票的商品
 function goldCreatorDetail(groupId, subTitleId, taskId, batchId, flag = false) {
+  $.skuList = [];
+  $.taskList = [];
+  $.remainVotes = 0;
   return new Promise(resolve => {
     const body = {
       groupId,
@@ -155,15 +161,17 @@ function goldCreatorDetail(groupId, subTitleId, taskId, batchId, flag = false) {
           if (safeGet(data)) {
             data = JSON.parse(data)
             if (data.code === '0') {
-              $.remainVotes = data.result.remainVotes;
-              $.skuList = data.result.skuList;
-              $.taskList = data.result.taskList;
+              $.remainVotes = data.result.remainVotes || 0;
+              $.skuList = data.result.skuList || [];
+              $.taskList = data.result.taskList || [];
               if (flag) {
                 await doTask2(batchId);
               } else {
                 console.log(`当前剩余投票次数：${$.remainVotes}`);
                 await doTask(subTitleId, taskId, batchId);
               }
+            } else {
+              console.log(`goldCreatorDetail 异常：${JSON.stringify(data)}`)
             }
           }
         }
@@ -248,7 +256,7 @@ function taskUrl(function_id, body = {}) {
       "Host": "api.m.jd.com",
       "Referer": "https://h5.m.jd.com/",
       "Cookie": cookie,
-      "User-Agent": "jdapp;iPhone;9.5.4;14.5.1;network/wifi;model/iPhone13,2;appBuild/167664;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"
+      "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
     }
   }
 }

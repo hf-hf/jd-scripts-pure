@@ -1,7 +1,7 @@
 /*
 更新地址：https://raw.githubusercontent.com/Wenmoux/scripts/wen/jd/jd_ddnc_farmpark.js
 号1默认给我助力 后续号给号1
-入口 https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ&adsource=null&initHash=/home&shareuserid4minipg=8A+Mf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w==&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446)
+入口 https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=c6acd767f7e041ffad8bb303e3e8fa72&adsource=null&initHash=/home&shareuserid4minipg=8A+Mf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w==&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446)
 ============Quantumultx===============
 [task_local]
 #欧洲狂欢杯
@@ -31,7 +31,7 @@ if ($.isNode()) {
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
 $.actid = "901100032442101"
-$.shareuuid = "eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ" //wen总的助力码
+$.shareuuid = "c6acd767f7e041ffad8bb303e3e8fa72"
     !(async () => {
         if (!cookiesArr[0]) {
             $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
@@ -97,8 +97,12 @@ $.shareuuid = "eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ" //wen总的助力码
                     }
                     await exchange(38) //兑换10豆
                     await getinfo()
-
-                    message += `【京东账号${$.index}】${$.nickName || $.UserName}\n${$.cow} \n ${$.exchange}\n`
+                    message += `【京东账号${$.index}】${$.nickName || $.UserName}\n${$.cow} \n ${$.exchange}\n\n`
+                   if($.index%3===0) 
+                   {
+                  await $.wait(60*1000) 
+                  console.log("休息休息~") 
+                   }
                 } else {
                     console.log("跑不起来了~请自己进去一次球场")
                 }
@@ -107,7 +111,7 @@ $.shareuuid = "eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ" //wen总的助力码
 
         if (message.length != 0) {
             if ($.isNode()) {
-                await notify.sendNotify("欧洲狂欢杯", `${message}\n 欧洲杯入口：https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ&adsource=null&initHash=/home&shareuserid4minipg=8A+Mf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w==&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446`);
+                await notify.sendNotify("欧洲狂欢杯", `${message}\n 欧洲杯入口：https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=c6acd767f7e041ffad8bb303e3e8fa72&adsource=null&initHash=/home&shareuserid4minipg=8A+Mf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w==&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446`);
             } else {
                 $.msg($.name, "", '欧洲狂欢杯' + message)
             }
@@ -123,7 +127,7 @@ $.shareuuid = "eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ" //wen总的助力码
 function genToken() {
     let config = {
         url: 'https://api.m.jd.com/client.action?functionId=genToken&clientVersion=10.0.5&build=88679&client=android&d_brand=Xiaomi&d_model=RedmiK30&osVersion=11&screen=2175*1080&partner=xiaomi001&oaid=b30cf82cacfa8972&openudid=290955c2782e1c44&eid=eidAef5f8122a0sf2tNlFbi9TV+3rtJ+jl5UptrTZo/Aq5MKUEaXcdTZC6RfEBt5Jt3Gtml2hS+ZvrWoDvkVv4HybKpJJVMdRUkzX7rGPOis1TRFRUdU&sdkVersion=30&lang=zh_CN&uuid=290955c2782e1c44&aid=290955c2782e1c44&area=8_573_6627_52446&networkType=wifi&wifiBssid=e4e99f6369a1d19cdb3d775040f7c6b7&uts=0f31TVRjBSupVC5FrtaNQe8qCtXMmNz3X0Tor1OQBShGe0p03DpNlSh7sVXWosFqLgKcvrTyAGQsC4k2rpivPt24vfw7RDcJ%2Bq3QNqsc1fLN%2BbBSAd15tXqtvyyu59mM4D2XVs0G%2B9W3S%2Bx6SVLo%2FNZhgOK3V5MWrb1p2BEgr2j%2FU2oD%2FuCgRPaaNEZrjrZSzhrs7Z6c8zVDknwdid42mw%3D%3D&uemps=0-0&st=1624552538730&sign=04d4841cd13e563172e60f4d5293fc45&sv=100',
-        body: 'body=%7B%22action%22%3A%22to%22%2C%22to%22%3A%22https%253A%252F%252Flzdz-isv.isvjcloud.com%252Fdingzhi%252Fhisense%252Feuropeancup%252Factivity%252F7431935%253FactivityId%253D901100032442101%2526shareUuid%253DeyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ%2526adsource%253Dnull%2526initHash%253D%252Fhome%2526shareuserid4minipg%253D8A%25252BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%25253D%25253D%2526shopid%253Dundefined%22%7D&',
+        body: 'body=%7B%22action%22%3A%22to%22%2C%22to%22%3A%22https%253A%252F%252Flzdz-isv.isvjcloud.com%252Fdingzhi%252Fhisense%252Feuropeancup%252Factivity%252F7431935%253FactivityId%253D901100032442101%2526shareUuid%253Dc6acd767f7e041ffad8bb303e3e8fa72%2526adsource%253Dnull%2526initHash%253D%252Fhome%2526shareuserid4minipg%253D8A%25252BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%25253D%25253D%2526shopid%253Dundefined%22%7D&',
         headers: {
             'Host': 'api.m.jd.com',
             'accept': '*/*',
@@ -232,14 +236,21 @@ function getMyPin() {
                 } else {
                     //       console.log(data)
                     data = JSON.parse(data);
+                                        if ($.isNode())
+                        for (let ck of resp['headers']['set-cookie']) {
+                            cookie = `${cookie}; ${ck.split(";")[0]};`
+                        }
+                    else {
+                        for (let ck of resp['headers']['Set-Cookie'].split(',')) {
+                            cookie = `${cookie}; ${ck.split(";")[0]};`
+                        }
+                    }
                     if (data.data && data.data.secretPin) {
                         $.pin = data.data.secretPin
                         //    console.log($.pin)
-                        cookie = `${cookie} AUTH_C_USER=${$.pin};`
+                     //   cookie = `${cookie} AUTH_C_USER=${$.pin};`
                         $.nickname = data.data.nickname
                         console.log(`欢迎回来~  ${$.nickname}`);
-                        $.lz_jdpin_token = resp['headers']['set-cookie'].filter(row => row.indexOf("lz_jdpin_token") !== -1)[0]
-                        console.log("lz_jdpin_token=" +$.lz_jdpin_token)
                     }
                 }
             } catch (e) {
@@ -252,7 +263,7 @@ function getMyPin() {
 }
 
 function adlog() {
-    let config = taskUrl("/common/accessLogWithAD", `venderId=1000324421&code=99&pin=${encodeURIComponent($.pin)}&activityId=901100032442101&pageUrl=https%3A%2F%2Flzdz-isv.isvjcloud.com%2Fdingzhi%2Fhisense%2Feuropeancup%2Factivity%2F4871674%3FactivityId%3D901100032442101%26shareUuid%3DeyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ%26adsource%3Dnull%26initHash%3D%2Fhome%26shareuserid4minipg%3D8A%252BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%253D%253D%26shopid%3Dundefined%26lng%3D107.146945%26lat%3D33.255267%26sid%3Dcad74d1c843bd47422ae20cadf6fe5aw%26un_area%3D27_2442_2444_31912%23%2Fhome&subType=app&adSource=null`)
+    let config = taskUrl("/common/accessLogWithAD", `venderId=1000324421&code=99&pin=${encodeURIComponent($.pin)}&activityId=901100032442101&pageUrl=https%3A%2F%2Flzdz-isv.isvjcloud.com%2Fdingzhi%2Fhisense%2Feuropeancup%2Factivity%2F4871674%3FactivityId%3D901100032442101%26shareUuid%3Dc6acd767f7e041ffad8bb303e3e8fa72%26adsource%3Dnull%26initHash%3D%2Fhome%26shareuserid4minipg%3D8A%252BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%253D%253D%26shopid%3Dundefined%26lng%3D107.146945%26lat%3D33.255267%26sid%3Dcad74d1c843bd47422ae20cadf6fe5aw%26un_area%3D27_2442_2444_31912%23%2Fhome&subType=app&adSource=null`)
     //   console.log(config)
     return new Promise(resolve => {
         $.post(config, async (err, resp, data) => {
@@ -281,7 +292,7 @@ function adlog() {
     })
 }
 
-// 获得用户信息
+// 获得用户信息  
 function getUserInfo() {
     return new Promise(resolve => {
         let body = `pin=${encodeURIComponent($.pin)}`
@@ -493,10 +504,10 @@ function taskUrl(url, body) {
             'Host': 'lzdz-isv.isvjcloud.com',
             'Accept': 'application/json',
             //     'X-Requested-With': 'XMLHttpRequest',
-            'Referer': `https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ&adsource=null&initHash=/home&shareuserid4minipg=8A%2BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%3D%3D&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446`,
+            'Referer': `https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=c6acd767f7e041ffad8bb303e3e8fa72&adsource=null&initHash=/home&shareuserid4minipg=8A%2BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%3D%3D&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446`,
             'user-agent': 'jdapp;android;10.0.4;11;2393039353533623-7383235613364343;network/wifi;model/Redmi K30;addressid/138549750;aid/290955c2782e1c44;oaid/b30cf82cacfa8972;osVer/30;appBuild/88641;partner/xiaomi001;eufv/1;jdSupportDarkMode/0;Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045537 Mobile Safari/537.36',
             'content-type': 'application/x-www-form-urlencoded',
-            'Cookie': `${cookie} IsvToken=${$.IsvToken};AUTH_C_USER=${$.pin};${$.lz_jdpin_token}`,
+            'Cookie': `${cookie} IsvToken=${$.IsvToken};AUTH_C_USER=${$.pin}`,
         }
     }
 }
@@ -509,10 +520,10 @@ function taskPostUrl(url, body) {
             'Host': 'lzdz-isv.isvjcloud.com',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            'Referer': `https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=eyJ0eXBlIjoiand0IiwiYWxnIjoiSFM1MTIifQ&adsource=null&initHash=/home&shareuserid4minipg=8A%2BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%3D%3D&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446`,
+            'Referer': `https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=c6acd767f7e041ffad8bb303e3e8fa72&adsource=null&initHash=/home&shareuserid4minipg=8A%2BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%3D%3D&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446`,
                 'user-agent': 'jdapp;android;10.0.4;11;2393039353533623-7383235613364343;network/wifi;model/Redmi K30;addressid/138549750;aid/290955c2782e1c44;oaid/b30cf82cacfa8972;osVer/30;appBuild/88641;partner/xiaomi001;eufv/1;jdSupportDarkMode/0;Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045537 Mobile Safari/537.36',
             'content-type': 'application/x-www-form-urlencoded',
-            'Cookie': `${cookie} IsvToken=${$.IsvToken};${$.lz_jdpin_token}`,
+            'Cookie': `${cookie} IsvToken=${$.IsvToken};`,
         }
     }
 }

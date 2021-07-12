@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/jd_sendBeans.js",
+            "program": "${workspaceFolder}/jd_summer_movement_help.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]

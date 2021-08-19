@@ -9,11 +9,14 @@
 [task_local]
 #领京豆额外奖励
 23 1,12,22 * * * https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_bean_home.js, tag=领京豆额外奖励, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jd_bean_home.png, enabled=true
+
 ================Loon==============
 [Script]
 cron "23 1,12,22 * * *" script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_bean_home.js, tag=领京豆额外奖励
+
 ===============Surge=================
 领京豆额外奖励 = type=cron,cronexp="23 1,12,22 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_bean_home.js
+
 ============小火箭=========
 领京豆额外奖励 = type=cron,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_bean_home.js, cronexpr="23 1,12,22 * * *", timeout=3600, enable=true
  */
@@ -66,49 +69,49 @@ const JD_API_HOST = 'https://api.m.jd.com/';
       await jdBeanHome();
     }
   }
-  for (let i = 0; i < cookiesArr.length; i++) {
-    $.index = i + 1;
-    if (cookiesArr[i]) {
-      cookie = cookiesArr[i];
-      $.canHelp = true;
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-      if ($.newShareCodes.length > 1) {
-        console.log(`\n【抢京豆】 ${$.UserName} 去助力排名第一的cookie`);
-        // let code = $.newShareCodes[(i + 1) % $.newShareCodes.length]
-        // await help(code[0], code[1])
-        let code = $.newShareCodes[0];
-        if(code[2] && code[2] ===  $.UserName){
-          //不助力自己
-        } else {
-          await help(code[0], code[1]);
-        }
-      }
-      if (helpAuthor && $.authorCode && $.canHelp) {
-        console.log(`\n【抢京豆】${$.UserName} 去帮助作者`)
-        for (let code of $.authorCode) {
-          const helpRes = await help(code.shareCode, code.groupCode);
-          if (helpRes && helpRes['code'] === '0') {
-            if (helpRes && helpRes.data && helpRes.data.respCode === 'SG209') {
-              console.log(`${helpRes.data.helpToast}\n`);
-              break;
-            }
-          } else {
-            console.log(`助力异常:${JSON.stringify(helpRes)}\n`);
-          }
-        }
-      }
-      for (let j = 1; j < $.newShareCodes.length && $.canHelp; j++) {
-        let code = $.newShareCodes[j];
-        if(code[2] && code[2] ===  $.UserName){
-          //不助力自己
-        } else {
-          console.log(`【抢京豆】${$.UserName} 去助力账号 ${j + 1}`);
-          await help(code[0], code[1]);
-          await $.wait(2000);
-        }
-      }
-    }
-  }
+  // for (let i = 0; i < cookiesArr.length; i++) {
+  //   $.index = i + 1;
+  //   if (cookiesArr[i]) {
+  //     cookie = cookiesArr[i];
+  //     $.canHelp = true;
+  //     $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+  //     if ($.newShareCodes.length > 1) {
+  //       console.log(`\n【抢京豆】 ${$.UserName} 去助力排名第一的cookie`);
+  //       // let code = $.newShareCodes[(i + 1) % $.newShareCodes.length]
+  //       // await help(code[0], code[1])
+  //       let code = $.newShareCodes[0];
+  //       if(code[2] && code[2] ===  $.UserName){
+  //         //不助力自己
+  //       } else {
+  //         await help(code[0], code[1]);
+  //       }
+  //     }
+  //     if (helpAuthor && $.authorCode && $.canHelp) {
+  //       console.log(`\n【抢京豆】${$.UserName} 去帮助作者`)
+  //       for (let code of $.authorCode) {
+  //         const helpRes = await help(code.shareCode, code.groupCode);
+  //         if (helpRes && helpRes['code'] === '0') {
+  //           if (helpRes && helpRes.data && helpRes.data.respCode === 'SG209') {
+  //             console.log(`${helpRes.data.helpToast}\n`);
+  //             break;
+  //           }
+  //         } else {
+  //           console.log(`助力异常:${JSON.stringify(helpRes)}\n`);
+  //         }
+  //       }
+  //     }
+  //     for (let j = 1; j < $.newShareCodes.length && $.canHelp; j++) {
+  //       let code = $.newShareCodes[j];
+  //       if(code[2] && code[2] ===  $.UserName){
+  //         //不助力自己
+  //       } else {
+  //         console.log(`【抢京豆】${$.UserName} 去助力账号 ${j + 1}`);
+  //         await help(code[0], code[1]);
+  //         await $.wait(2000);
+  //       }
+  //     }
+  //   }
+  // }
 })()
   .catch((e) => {
     $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')

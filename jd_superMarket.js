@@ -309,32 +309,32 @@ async function businessCircleActivity() {
     console.log(`pkActivityId:${pkActivityId}\n`);
 
     if (joinStatus === 0) {
-      if (joinPkTeam === 'true') {
-        console.log(`\n注：PK会在每天的七点自动随机加入LXK9301创建的队伍\n`)
-        await updatePkActivityIdCDN('https://cdn.jsdelivr.net/gh/gitupdate/updateTeam@master/shareCodes/jd_updateTeam.json');
-        console.log(`\nupdatePkActivityId[pkActivityId]:::${$.updatePkActivityIdRes && $.updatePkActivityIdRes.pkActivityId}`);
-        console.log(`\n京东服务器返回的[pkActivityId] ${pkActivityId}`);
-        if ($.updatePkActivityIdRes && ($.updatePkActivityIdRes.pkActivityId === pkActivityId)) {
-          await getTeam();
-          let Teams = []
-          Teams = $.updatePkActivityIdRes['Teams'] || Teams;
-          if ($.getTeams && $.getTeams.length) {
-            Teams = [...Teams, ...$.getTeams.filter(item => item['pkActivityId'] === `${pkActivityId}`)];
-          }
-          const randomNum = randomNumber(0, Teams.length);
+      // if (joinPkTeam === 'true') {
+      //   console.log(`\n注：PK会在每天的七点自动随机加入LXK9301创建的队伍\n`)
+      //   await updatePkActivityIdCDN('https://cdn.jsdelivr.net/gh/gitupdate/updateTeam@master/shareCodes/jd_updateTeam.json');
+      //   console.log(`\nupdatePkActivityId[pkActivityId]:::${$.updatePkActivityIdRes && $.updatePkActivityIdRes.pkActivityId}`);
+      //   console.log(`\n京东服务器返回的[pkActivityId] ${pkActivityId}`);
+      //   if ($.updatePkActivityIdRes && ($.updatePkActivityIdRes.pkActivityId === pkActivityId)) {
+      //     await getTeam();
+      //     let Teams = []
+      //     Teams = $.updatePkActivityIdRes['Teams'] || Teams;
+      //     if ($.getTeams && $.getTeams.length) {
+      //       Teams = [...Teams, ...$.getTeams.filter(item => item['pkActivityId'] === `${pkActivityId}`)];
+      //     }
+      //     const randomNum = randomNumber(0, Teams.length);
 
-          const res = await smtg_joinPkTeam(Teams[randomNum] && Teams[randomNum].teamId, Teams[randomNum] && Teams[randomNum].inviteCode, pkActivityId);
-          if (res && res.data.bizCode === 0) {
-            console.log(`加入战队成功`)
-          } else if (res && res.data.bizCode === 229) {
-            console.log(`加入战队失败,该战队已满\n无法加入`)
-          } else {
-            console.log(`加入战队其他未知情况:${JSON.stringify(res)}`)
-          }
-        } else {
-          console.log('\nupdatePkActivityId请求返回的pkActivityId与京东服务器返回不一致,暂时不加入战队')
-        }
-      }
+      //     const res = await smtg_joinPkTeam(Teams[randomNum] && Teams[randomNum].teamId, Teams[randomNum] && Teams[randomNum].inviteCode, pkActivityId);
+      //     if (res && res.data.bizCode === 0) {
+      //       console.log(`加入战队成功`)
+      //     } else if (res && res.data.bizCode === 229) {
+      //       console.log(`加入战队失败,该战队已满\n无法加入`)
+      //     } else {
+      //       console.log(`加入战队其他未知情况:${JSON.stringify(res)}`)
+      //     }
+      //   } else {
+      //     console.log('\nupdatePkActivityId请求返回的pkActivityId与京东服务器返回不一致,暂时不加入战队')
+      //   }
+      // }
     } else if (joinStatus === 1) {
       if (teamId) {
         console.log(`inviteCode: [${inviteCode}]`);

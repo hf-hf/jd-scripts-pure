@@ -13,10 +13,10 @@ const $ = new Env('财富大陆');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 // const notify = $.isNode() ? require('./sendNotify') : '';
 $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
-let UA = `jdapp;iPhone;10.0.5;${Math.ceil(Math.random()*2+12)}.${Math.ceil(Math.random()*4)};${randomString(40)};`
+let UA = `jdpingou;iPhone;5.2.2;14.3;${randomString(40)};network/wifi;model/iPhone12,1;appBuild/100630;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/1;pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`
 function randomString(e) {
   e = e || 32;
-  let t = "abcdefhijkmnprstwxyz2345678", a = t.length, n = "";
+  let t = "abcdef0123456789", a = t.length, n = "";
   for (i = 0; i < e; i++)
     n += t.charAt(Math.floor(Math.random() * a));
   return n
@@ -61,7 +61,7 @@ $.appId = 10032;
       $.index = i + 1;
       $.isLogin = true;
       console.log(`\n*****开始【京东账号${$.index}】${$.UserName}****\n`);
-      UA = `jdapp;iPhone;10.0.5;${Math.ceil(Math.random()*2+12)}.${Math.ceil(Math.random()*4)};${randomString(40)};`
+      UA = `jdpingou;iPhone;5.2.2;14.3;${randomString(40)};network/wifi;model/iPhone12,1;appBuild/100630;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/1;pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`
       await run();
     }
   }
@@ -135,6 +135,8 @@ async function run() {
     await buildList()
     // 签到 邀请奖励
     await sign()
+    // 签到-小程序
+    await signs()
     // 捡垃圾
     await pickshell(1)
     // 热气球接客
@@ -156,8 +158,9 @@ async function run() {
   }
 }
 async function GetHomePageInfo() {
-  let additional= `&ddwTaskId&strShareId&strMarkList=guider_step%2Ccollect_coin_auth%2Cguider_medal%2Cguider_over_flag%2Cbuild_food_full%2Cbuild_sea_full%2Cbuild_shop_full%2Cbuild_fun_full%2Cmedal_guider_show%2Cguide_guider_show%2Cguide_receive_vistor`
-  let stk= `_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strMarkList,strShareId,strZone`
+  let e = getJxAppToken()
+  let additional= `&strPgtimestamp=${e.strPgtimestamp}&strPhoneID=${e.strPhoneID}&strPgUUNum=${e.strPgUUNum}&ddwTaskId=&strShareId=&strMarkList=guider_step%2Ccollect_coin_auth%2Cguider_medal%2Cguider_over_flag%2Cbuild_food_full%2Cbuild_sea_full%2Cbuild_shop_full%2Cbuild_fun_full%2Cmedal_guider_show%2Cguide_guider_show%2Cguide_receive_vistor%2Cdaily_task%2Cguider_daily_task%2Ccfd_has_show_selef_point`
+  let stk= `_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strMarkList,strPgUUNum,strPgtimestamp,strPhoneID,strShareId,strVersion,strZone`
   $.HomeInfo = await taskGet(`user/QueryUserInfo`, stk, additional)
   if($.HomeInfo){
     $.Fund = $.HomeInfo.Fund || ''
@@ -358,8 +361,9 @@ async function sign(){
           }
         }
         if(flag){
-          let additional = `&ptag=&ddwCoin=${ddwCoin}&ddwMoney=${ddwMoney}&dwPrizeType=${dwPrizeType}&strPrizePool${strPrizePool && '='+strPrizePool ||''}&dwPrizeLv=${dwPrizeLv}`
-          let stk= `_cfd_t,bizCode,ddwCoin,ddwMoney,dwEnv,dwPrizeLv,dwPrizeType,ptag,source,strPrizePool,strZone`
+          let e = getJxAppToken()
+          let additional = `&ptag=&ddwCoin=${ddwCoin}&ddwMoney=${ddwMoney}&dwPrizeType=${dwPrizeType}&strPrizePool${strPrizePool && '='+strPrizePool ||''}&dwPrizeLv=${dwPrizeLv}&strPgtimestamp=${e.strPgtimestamp}&strPhoneID=${e.strPhoneID}&strPgUUNum=${e.strPgUUNum}`
+          let stk= `_cfd_t,bizCode,ddwCoin,ddwMoney,dwEnv,dwPrizeLv,dwPrizeType,ptag,source,strPrizePool,strPgUUNum,strPgtimestamp,strPhoneID,strZone`
           let res = await taskGet(`story/RewardSign`, stk, additional)
           await printRes(res, '签到')
         }
@@ -381,22 +385,63 @@ async function sign(){
     $.logErr(e);
   }
 }
+// 签到-小程序
+async function signs(){
+  try{
+    // 签到-小程序
+    await $.wait(2000)
+    $.Aggrtask = await taskGet(`story/GetTakeAggrPages`, '_cfd_t,bizCode,dwEnv,ptag,source,strZone', '&ptag=')
+    if($.Aggrtask && $.Aggrtask.Data && $.Aggrtask.Data.Sign){
+      if($.Aggrtask.Data.Sign.dwTodayStatus == 0) {
+        console.log('\n签到-小程序')
+        let flag = false
+        let ddwCoin = 0
+        let ddwMoney = 0
+        let dwPrizeType = 0
+        let strPrizePool = 0
+        let dwPrizeLv = 0
+        for(i of $.Aggrtask.Data.Sign.SignList){
+          if(i.dwStatus == 0){
+            flag = true
+            ddwCoin = i.ddwCoin || 0
+            ddwMoney = i.ddwMoney || 0
+            dwPrizeType = i.dwPrizeType || 0
+            strPrizePool = i.strPrizePool || 0
+            dwPrizeLv = i.dwBingoLevel || 0
+            break;
+          }
+        }
+        if(flag){
+          let e = getJxAppToken()
+          let additional = `&ptag=&ddwCoin=${ddwCoin}&ddwMoney=${ddwMoney}&dwPrizeType=${dwPrizeType}&strPrizePool${strPrizePool && '='+strPrizePool ||''}&dwPrizeLv=${dwPrizeLv}&strPgtimestamp=${e.strPgtimestamp}&strPhoneID=${e.strPhoneID}&strPgUUNum=${e.strPgUUNum}`
+          let stk= `_cfd_t,bizCode,ddwCoin,ddwMoney,dwEnv,dwPrizeLv,dwPrizeType,ptag,source,strPrizePool,strPgUUNum,strPgtimestamp,strPhoneID,strZone`
+          let res = await taskGet(`story/RewardSigns`, stk, additional)
+          await printRes(res, '签到-小程序')
+        }
+      }
+    }
+  }catch (e) {
+    $.logErr(e);
+  }
+}
 // 捡垃圾
 async function pickshell(num = 1){
   return new Promise(async (resolve) => {
     try{
       console.log(`\n捡垃圾`)
-      // pickshell dwType 1珍珠 2海螺 3大海螺  4海星
+      // pickshell dwType 1珍珠 2海螺 3大海螺  4海星 5小贝壳 6扇贝
       for(i=1;num--;i++){
         await $.wait(2000)
         $.queryshell = await taskGet(`story/queryshell`, '_cfd_t,bizCode,dwEnv,ptag,source,strZone', `&ptag=`)
-        let c = 4
+        let c = 6
         for(i=1;c--;i++){
           let o = 1
           let name = '珍珠'
           if(i == 2) name = '海螺'
           if(i == 3) name = '大海螺'
           if(i == 4) name = '海星'
+          if(i == 5) name = '小贝壳'
+          if(i == 6) name = '扇贝'
           do{
             console.log(`去捡${name}第${o}次`)
             o++;
@@ -522,11 +567,29 @@ async function Guide(){
 async function Pearl(){
   try{
     await $.wait(2000)
-    $.ComposeGameState = await taskGet(`user/ComposeGameState`, '', '')
-    console.log(`\n当前有${$.ComposeGameState.dwCurProgress}颗珍珠`)
-    if ($.ComposeGameState.dwCurProgress < 8 && $.ComposeGameState.strDT) {
+    $.ComposeGameState = await taskGet(`user/ComposePearlState`, '', '&dwGetType=0')
+    console.log(`\n当前有${$.ComposeGameState.dwCurProgress}个月饼${$.ComposeGameState.ddwVirHb && ' '+$.ComposeGameState.ddwVirHb/100+"红包" || ''}`)
+    if($.ComposeGameState.dayDrawInfo.dwIsDraw == 0){
+      let res = ''
+      res = await taskGet(`user/GetPearlDailyReward`, '__t,strZone', ``)
+      if(res && res.iRet == 0 && res.strToken){
+        res = await taskGet(`user/PearlDailyDraw`, '__t,ddwSeaonStart,strToken,strZone', `&ddwSeaonStart=${$.ComposeGameState.ddwSeasonStartTm}&strToken=${res.strToken}`)
+        if(res && res.iRet == 0){
+          if(res.strPrizeName){
+            console.log(`抽奖获得:${res.strPrizeName || $.toObj(res,res)}`)
+          }else{
+            console.log(`抽奖获得:${$.toObj(res,res)}`)
+          }
+        }else{
+          console.log("抽奖失败\n"+$.toObj(res,res))
+        }
+      }else{
+        console.log($.toObj(res,res))
+      }
+    }
+    if (($.ComposeGameState.dwCurProgress < 8 || true) && $.ComposeGameState.strDT) {
       let b = 1
-      console.log(`合珍珠${b}次 `)
+      console.log(`合月饼${b}次 `)
       // b = 8-$.ComposeGameState.dwCurProgress
       for(i=1;b--;i++){
         let n = Math.ceil(Math.random()*12+12)
@@ -534,23 +597,24 @@ async function Pearl(){
         for(m=1;n--;m++){
           console.log(`上报第${m}次`)
           await $.wait(5000)
-          await taskGet(`user/RealTmReport`, '', `&dwIdentityType=0&strBussKey=composegame&strMyShareId=${$.ComposeGameState.strMyShareId}&ddwCount=5`)
+          await taskGet(`user/RealTmReport`, '', `&dwIdentityType=0&strBussKey=composegame&strMyShareId=${$.ComposeGameState.strMyShareId}&ddwCount=10`)
         }
-        console.log("合成珍珠")
-        let res = await taskGet(`user/ComposeGameAddProcess`, '__t,strBT,strZone', `&strBT=${$.ComposeGameState.strDT}`)
+        console.log("合成月饼")
+        let strLT = ($.ComposeGameState.oPT || [])[$.ComposeGameState.ddwCurTime % ($.ComposeGameState.oPT || []).length]
+        let res = await taskGet(`user/ComposePearlAddProcess`, '__t,strBT,strLT,strZone', `&strBT=${$.ComposeGameState.strDT}&strLT=${strLT}`)
         if(res && res.iRet == 0){
-          console.log(`合成成功:当前有${res.dwCurProgress}颗`)
+          console.log(`合成成功:${res.ddwAwardHb && '获得'+res.ddwAwardHb/100+"红包 " || ''}当前有${res.dwCurProgress}个月饼${res.ddwVirHb && ' '+res.ddwVirHb/100+"红包" || ''}`)
         }else{
           console.log(JSON.stringify(res))
         }
-        $.ComposeGameState = await taskGet(`user/ComposeGameState`, '', '')
+        $.ComposeGameState = await taskGet(`user/ComposePearlState`, '', '&dwGetType=0')
       }
     }
-    for (let i of $.ComposeGameState.stagelist) {
+    for (let i of $.ComposeGameState.stagelist || []) {
       if (i.dwIsAward == 0 && $.ComposeGameState.dwCurProgress >= i.dwCurStageEndCnt) {
         await $.wait(2000)
         let res = await taskGet(`user/ComposeGameAward`, '__t,dwCurStageEndCnt,strZone', `&dwCurStageEndCnt=${i.dwCurStageEndCnt}`)
-        await printRes(res,'珍珠领奖')
+        await printRes(res,'月饼领奖')
       }
     }
   }catch (e) {
@@ -595,14 +659,12 @@ async function ActTask(){
         }
         if(item.dwAwardStatus == 2 && item.dwCompleteNum < item.dwTargetNum && [1,2].includes(item.dwOrderId)){
           await $.wait(1000)
-          if(item.dwOrderId == 2){
-            if(item.strTaskName.indexOf('热气球接待') > -1){
-              let b = (item.dwTargetNum-item.dwCompleteNum)
-              // 热气球接客
-              await service(b)
-              await $.wait((Number(item.dwLookTime) * 1000) || 1000)
-            }
-          }else if(item.dwOrderId == 1){
+          if(item.strTaskName.indexOf('热气球接待') > -1){
+            let b = (item.dwTargetNum-item.dwCompleteNum)
+            // 热气球接客
+            await service(b)
+            await $.wait((Number(item.dwLookTime) * 1000) || 1000)
+          }else if(item.dwPointType == 301){
             await $.wait((Number(item.dwLookTime) * 1000) || 1000)
             res = await taskGet('DoTask1', '_cfd_t,bizCode,configExtra,dwEnv,ptag,source,strZone,taskId', `&ptag=&taskId=${item.ddwTaskId}&configExtra=`)
           }
@@ -658,7 +720,7 @@ async function UserTask(){
           await $.wait(1000)
         }
         if(item.dateType == 2){
-          if(item.awardStatus === 2 && item.completedTimes < item.targetTimes && [1,2,3,4].includes(item.orderId)){
+          if(item.completedTimes < item.targetTimes && [1,2,3,4].includes(item.orderId)){
             if(item.taskName.indexOf('捡贝壳') >-1 || item.taskName.indexOf('赚京币任务') >-1) continue
             let b = (item.targetTimes-item.completedTimes)
             for(i=1;b--;i++){
@@ -714,6 +776,23 @@ function printRes(res, msg=''){
     console.log(`${msg}失败:${res.sErrMsg}`)
   }else{
     console.log(`${msg}失败:${JSON.stringify(res)}`)
+  }
+}
+function getJxAppToken(){
+  function generateStr(e) {
+    e = e || 32;
+    let t = "abcdefghijklmnopqrstuvwxyz1234567890", a = t.length, n = "";
+    for (i = 0; i < e; i++)
+      n += t.charAt(Math.floor(Math.random() * a));
+    return n
+  }
+  let phoneId = generateStr(40);
+  let timestamp = Date.now().toString();
+  let pgUUNum = $.CryptoJS.MD5('' + decodeURIComponent($.UserName || '') + timestamp + phoneId + 'tPOamqCuk9NLgVPAljUyIHcPRmKlVxDy').toString($.CryptoJS.enc.MD5);
+  return {
+    'strPgtimestamp': timestamp,
+    'strPhoneID': phoneId,
+    'strPgUUNum': pgUUNum
   }
 }
 async function noviceTask(){
@@ -774,13 +853,17 @@ function taskGet(type, stk, additional){
 }
 function getGetRequest(type, stk='', additional='') {
   let url = ``;
+  let dwEnv = 7;
   if(type == 'user/ComposeGameState'){
-    url = `https://m.jingxi.com/jxbfd/${type}?__t=${Date.now()}&strZone=jxbfd&dwFirst=1&_=${Date.now()}&sceneval=2`
+    url = `https://m.jingxi.com/jxbfd/${type}?__t=${Date.now()}&strZone=jxbfd${additional}&_=${Date.now()}&sceneval=2`
   }else if(type == 'user/RealTmReport'){
     url = `https://m.jingxi.com/jxbfd/${type}?__t=${Date.now()}${additional}&_=${Date.now()}&sceneval=2`
   }else{
     let stks = ''
     if(stk) stks = `&_stk=${stk}`
+    if(type == 'story/GetTakeAggrPages' || type == 'story/RewardSigns') dwEnv = 6
+    if(type == 'story/GetTakeAggrPages') type = 'story/GetTakeAggrPage'
+    if(type == 'story/RewardSigns') type = 'story/RewardSign'
     if(type == 'GetUserTaskStatusList' || type == 'Award' || type == 'Award1' || type == 'DoTask' || type == 'DoTask1'){
       let bizCode = 'jxbfd'
       if(type == 'Award1'){
@@ -790,11 +873,11 @@ function getGetRequest(type, stk='', additional='') {
         bizCode = 'jxbfddch'
         type = 'DoTask'
       }
-      url = `https://m.jingxi.com/newtasksys/newtasksys_front/${type}?strZone=jxbfd&bizCode=${bizCode}&source=jxbfd&dwEnv=3&_cfd_t=${Date.now()}${additional}${stks}&_ste=1&_=${Date.now()}&sceneval=2&g_login_type=1`
+      url = `https://m.jingxi.com/newtasksys/newtasksys_front/${type}?strZone=jxbfd&bizCode=${bizCode}&source=jxbfd&dwEnv=${dwEnv}&_cfd_t=${Date.now()}${additional}${stks}&_ste=1&_=${Date.now()}&sceneval=2&g_login_type=1`
     }else if(type == 'user/ComposeGameAddProcess' || type == 'user/ComposeGameAward'){
       url = `https://m.jingxi.com/jxbfd/${type}?strZone=jxbfd&__t=${Date.now()}${additional}${stks}&_=${Date.now()}&sceneval=2`;
     }else{
-      url = `https://m.jingxi.com/jxbfd/${type}?strZone=jxbfd&bizCode=jxbfd&source=jxbfd&dwEnv=7&_cfd_t=${Date.now()}&ptag=${additional}${stks}&_=${Date.now()}&sceneval=2`;
+      url = `https://m.jingxi.com/jxbfd/${type}?strZone=jxbfd&bizCode=jxbfd&source=jxbfd&dwEnv=${dwEnv}&_cfd_t=${Date.now()}&ptag=${additional}${stks}&_=${Date.now()}&sceneval=2`;
     }
     url += `&h5st=${decrypt(Date.now(), stk, '', url)}`;
   }

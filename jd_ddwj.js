@@ -95,6 +95,7 @@ for(let i = 0; i < cookiesArr.length; i++){
     
 
 function PostRequest(uri,body) {
+  let ua = getUA();
   const url = `https://api.m.jd.com/client.action?${uri}`;
   const method = `POST`;
   const headers = {"Accept": "application/json",
@@ -105,9 +106,20 @@ function PostRequest(uri,body) {
 "Origin": "https://h5.m.jd.com",
 "Cookie": cookie,
 "Host": "api.m.jd.com",
-"User-Agent": "jdapp;iPhone;10.0.6;14.4;0bcbcdb2a68f16cf9c9ad7c9b944fd141646a849;network/4g;model/iPhone12,1;addressid/2377723269;appBuild/167724;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"
+"User-Agent": ua
 }
   return {url: url, method: method, headers: headers, body: body};
+}
+
+function getUA(){  
+  return "jdapp;iPhone;10.1.4;${randomString(40)};CFNetwork/1197;Darwin/20.0.0;network/4g;model/iPhone12,1;addressid/2377744469;appBuild/168824;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"
+}
+function randomString(e) {
+  e = e || 32;
+  let t = "abcdef0123456789", a = t.length, n = "";
+  for (i = 0; i < e; i++)
+    n += t.charAt(Math.floor(Math.random() * a));
+  return n
 }
 
 async function doTask(){

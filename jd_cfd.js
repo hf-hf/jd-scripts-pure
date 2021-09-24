@@ -1,7 +1,7 @@
 /*
 京喜财富岛
 cron 5 * * * * jd_cfd.js
-更新时间：2021-7-13
+更新时间：2021-9-11
 活动入口：京喜APP-我的-京喜财富岛
 
 已支持IOS双京东账号,Node.js支持N个京东账号
@@ -37,6 +37,8 @@ $.notifyTime = $.getdata("cfd_notifyTime");
 $.result = [];
 $.shareCodes = [];
 let cookiesArr = [], cookie = '', token = '';
+let UA, UAInfo = {}, num
+let nowTimes;
 
 const randomCount = $.isNode() ? 3 : 3;
 if ($.isNode()) {
@@ -58,13 +60,14 @@ $.appId = 10028;
   $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
   await requestAlgo();
   await $.wait(1000)
-  let res = await getAuthorShareCode('https://raw.githubusercontent.com/Aaron-lv/updateTeam/master/shareCodes/cfd.json')
-  if (!res) {
-    $.http.get({url: 'https://purge.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json'}).then((resp) => {}).catch((e) => console.log('刷新CDN异常', e));
-    await $.wait(1000)
-    res = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json')
-  }
-  $.strMyShareIds = [...(res && res.shareId || [])]
+  $.strMyShareIds = [
+    'DFB7456ECA849BF5A3D2272658CDE8038B46B526FDFA140355B0A3A5E5A89250', 
+    '754FD76997C6C5DA5D5D590476270CC1307FFC059966F631240FE78ABFA8944D',
+    '9D6FF23FA49EEE6450DBC2DFBB98644658CBD932718595BEA4B5AFC1C4CF3D73',
+    'FAE8E8F007198CAA5FA25879D3E2C63A00BA064A876F22441C0261E3FA24112C',
+    'DF4ACEB335F2F5F791BCFB813C1A19B40CFAF29DC16E3888AFDC0DE5705AB6FF',
+    '7A56C48C76CA199C5B9E2BC702CC6372E654F1EBC7C0F1DBB9EA2BA9F47CA2C6',
+  ]
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       cookie = cookiesArr[i];
@@ -84,33 +87,46 @@ $.appId = 10028;
       }
       $.allTask = []
       $.info = {}
+      UA = `jdpingou;iPhone;4.13.0;14.4.2;${randomString(40)};network/wifi;model/iPhone10,2;appBuild/100609;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/1;hasOCPay/0;supportBestPay/0;session/${Math.random * 98 + 1};pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`
       token = await getJxToken()
       await shareCodesFormat()
       await cfd();
       await $.wait(2000);
+      UAInfo[$.UserName] = UA
     }
   }
-  for (let j = 0; j < cookiesArr.length; j++) {
-    cookie = cookiesArr[j];
+  for (let i = 0; i < cookiesArr.length; i++) {
+    cookie = cookiesArr[i];
     $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
     $.canHelp = true
+    UA = UAInfo[$.UserName]
+    num = 0
     if ($.shareCodes && $.shareCodes.length) {
       console.log(`\n自己账号内部循环互助\n`);
-      for (let id of $.shareCodes) {
-        console.log(`账号${$.UserName} 去助力 ${id}`)
-        await helpByStage(id)
-        if (!$.canHelp) break
-        await $.wait(3000)
+      for (let j = 0; j < $.shareCodes.length && $.canHelp; j++) {
+        console.log(`账号${$.UserName} 去助力 ${$.shareCodes[j]}`)
+        $.delcode = false
+        await helpByStage($.shareCodes[j])
+        await $.wait(2000)
+        if ($.delcode) {
+          $.shareCodes.splice(j, 1)
+          j--
+          continue
+        }
       }
     }
-    if (!$.canHelp) continue
-    if ($.strMyShareIds && $.strMyShareIds.length) {
+    if ($.strMyShareIds && $.strMyShareIds.length && $.canHelp) {
       console.log(`\n助力作者\n`);
-      for (let id of $.strMyShareIds) {
-        console.log(`账号${$.UserName} 去助力 ${id}`)
-        await helpByStage(id)
-        if (!$.canHelp) break
-        await $.wait(3000)
+      for (let j = 0; j < $.strMyShareIds.length && $.canHelp; j++) {
+        console.log(`账号${$.UserName} 去助力 ${$.strMyShareIds[j]}`)
+        $.delcode = false
+        await helpByStage($.strMyShareIds[j])
+        await $.wait(2000)
+        if ($.delcode) {
+          $.strMyShareIds.splice(j, 1)
+          j--
+          continue
+        }
       }
     }
   }
@@ -121,13 +137,14 @@ $.appId = 10028;
 
 async function cfd() {
   try {
+    nowTimes = new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000)
     let beginInfo = await getUserInfo();
-    if (beginInfo.Fund.ddwFundTargTm === 0) {
+    if (beginInfo.LeadInfo.dwLeadType === 2) {
       console.log(`还未开通活动，尝试初始化`)
       await noviceTask()
       await $.wait(2000)
       beginInfo = await getUserInfo(false);
-      if (beginInfo.Fund.ddwFundTargTm !== 0) {
+      if (beginInfo.LeadInfo.dwLeadType !== 2) {
         console.log(`初始化成功\n`)
       } else {
         console.log(`初始化失败\n`)
@@ -135,9 +152,27 @@ async function cfd() {
       }
     }
 
+    // 寻宝
+    console.log(`寻宝`)
+    let XBDetail = beginInfo.XbStatus.XBDetail.filter((x) => x.dwRemainCnt !== 0)
+    if (XBDetail.length !== 0) {
+      console.log(`开始寻宝`)
+      for (let key of Object.keys(XBDetail)) {
+        let vo = XBDetail[key]
+        await $.wait(2000)
+        await TreasureHunt(vo.strIndex)
+      }
+    } else {
+      console.log(`暂无宝物`)
+    }
+
     //每日签到
     await $.wait(2000)
     await getTakeAggrPage('sign')
+
+    //小程序每日签到
+    await $.wait(2000)
+    await getTakeAggrPage('wxsign')
 
     //助力奖励
     await $.wait(2000)
@@ -158,8 +193,10 @@ async function cfd() {
     }
 
     //合成珍珠
-    await $.wait(2000)
-    await composeGameState()
+    // if (nowTimes.getHours() >= 5) {
+    //   await $.wait(2000)
+    //   await composeGameState()
+    // }
 
     //接待贵宾
     console.log(`接待贵宾`)
@@ -256,14 +293,40 @@ async function cfd() {
         `【💵财富值】${endInfo.ddwRichBalance}\n`,
     );
 
-    // $.result.push(
-    //     `【京东账号${$.index}】${$.nickName || $.UserName}`,
-    //     `【💵财富值】任务前: ${beginInfo.ddwRichBalance}\n【💵财富值】任务后: ${endInfo.ddwRichBalance}`,
-    //     `【💵财富值】净增值: ${endInfo.ddwRichBalance - beginInfo.ddwRichBalance}\n`
-    // );
   } catch (e) {
     $.logErr(e)
   }
+}
+
+// 寻宝
+function TreasureHunt(strIndex) {
+  return new Promise((resolve) => {
+    $.get(taskUrl(`user/TreasureHunt`, `strIndex=${strIndex}`), (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} TreasureHunt API请求失败，请检查网路重试`)
+        } else {
+          data = JSON.parse(data);
+          if (data.iRet === 0) {
+            if (data.AwardInfo.dwAwardType === 0) {
+              console.log(`${data.strAwardDesc}，获得 ${data.AwardInfo.ddwValue} 金币`)
+            } else if (data.AwardInfo.dwAwardType === 1) {
+              console.log(`${data.strAwardDesc}，获得 ${data.AwardInfo.ddwValue} 财富`)
+            } else {
+              console.log(JSON.stringify(data))
+            }
+          } else {
+            console.log(`寻宝失败：${data.sErrMsg}`)
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp);
+      } finally {
+        resolve();
+      }
+    })
+  })
 }
 
 // 合成珍珠
@@ -565,13 +628,43 @@ async function getTakeAggrPage(type) {
               console.log(`${$.name} GetTakeAggrPage API请求失败，请检查网路重试`)
             } else {
               data = JSON.parse(data);
-              console.log(`每日签到`)
+              console.log(`\n每日签到`)
               for (let key of Object.keys(data.Data.Sign.SignList)) {
                 let vo = data.Data.Sign.SignList[key]
                 if (vo.dwDayId === data.Data.Sign.dwTodayId) {
                   if (vo.dwStatus !== 1) {
-                    const body = `ddwCoin=${vo.ddwCoin}&ddwMoney=${vo.ddwMoney}&dwPrizeType=${vo.dwPrizeType}&strPrizePool=${vo.strPrizePool}&dwPrizeLv=${vo.dwBingoLevel}`
+                    const body = `ddwCoin=${vo.ddwCoin}&ddwMoney=${vo.ddwMoney}&dwPrizeType=${vo.dwPrizeType}&strPrizePool=${vo.strPrizePool}&dwPrizeLv=${vo.dwBingoLevel}&strPgUUNum=${token['farm_jstoken']}&strPgtimestamp=${token['timestamp']}&strPhoneID=${token['phoneid']}`
                     await rewardSign(body)
+                    await $.wait(2000)
+                  } else {
+                    console.log(`今日已签到\n`)
+                    break
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            $.logErr(e, resp);
+          } finally {
+            resolve();
+          }
+        })
+        break
+      case 'wxsign':
+        $.get(taskUrl(`story/GetTakeAggrPage`, '', 6), async (err, resp, data) => {
+          try {
+            if (err) {
+              console.log(`${JSON.stringify(err)}`)
+              console.log(`${$.name} GetTakeAggrPage API请求失败，请检查网路重试`)
+            } else {
+              data = JSON.parse(data);
+              console.log(`小程序每日签到`)
+              for (let key of Object.keys(data.Data.Sign.SignList)) {
+                let vo = data.Data.Sign.SignList[key]
+                if (vo.dwDayId === data.Data.Sign.dwTodayId) {
+                  if (vo.dwStatus !== 1) {
+                    const body = `ddwCoin=${vo.ddwCoin}&ddwMoney=${vo.ddwMoney}&dwPrizeType=${vo.dwPrizeType}&strPrizePool=${vo.strPrizePool}&dwPrizeLv=${vo.dwBingoLevel}&strPgUUNum=${token['farm_jstoken']}&strPgtimestamp=${token['timestamp']}&strPhoneID=${token['phoneid']}`
+                    await rewardSign(body, 6)
                     await $.wait(2000)
                   } else {
                     console.log(`今日已签到\n`)
@@ -624,9 +717,9 @@ async function getTakeAggrPage(type) {
     }
   })
 }
-function rewardSign(body) {
+function rewardSign(body, dwEnv = 7) {
   return new Promise((resolve) => {
-    $.get(taskUrl(`story/RewardSign`, body), (err, resp, data) => {
+    $.get(taskUrl(`story/RewardSign`, body, dwEnv), (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
@@ -791,7 +884,7 @@ async function getActTask(type = true) {
           if (type) {
             for (let key of Object.keys(data.Data.TaskList)) {
               let vo = data.Data.TaskList[key]
-              if (vo.dwOrderId === 1 && vo.dwCompleteNum !== vo.dwTargetNum) {
+              if ([1, 2].includes(vo.dwOrderId) && (vo.dwCompleteNum !== vo.dwTargetNum)) {
                 console.log(`开始【🐮牛牛任务】${vo.strTaskName}`)
                 for (let i = vo.dwCompleteNum; i < vo.dwTargetNum; i++) {
                   console.log(`【🐮牛牛任务】${vo.strTaskName} 进度：${i + 1}/${vo.dwTargetNum}`)
@@ -803,7 +896,7 @@ async function getActTask(type = true) {
             data = await getActTask(false)
             for (let key of Object.keys(data.Data.TaskList)) {
               let vo = data.Data.TaskList[key]
-              if (vo.dwCompleteNum >= vo.dwTargetNum && vo.dwAwardStatus !== 1) {
+              if ((vo.dwCompleteNum >= vo.dwTargetNum) && vo.dwAwardStatus !== 1) {
                 await awardActTask('Award', vo)
                 await $.wait(2000)
               }
@@ -895,6 +988,13 @@ async function employTourGuideInfo() {
         } else {
           data = JSON.parse(data);
           console.log(`雇导游`)
+          let minProductCoin = data.TourGuideList[0].ddwProductCoin
+          for(let key of Object.keys(data.TourGuideList)) {
+            let vo = data.TourGuideList[key]
+            if (vo.ddwProductCoin < minProductCoin) {
+              minProductCoin = vo.ddwProductCoin
+            }
+          }
           for(let key of Object.keys(data.TourGuideList)) {
             let vo = data.TourGuideList[key]
             let buildNmae;
@@ -913,16 +1013,17 @@ async function employTourGuideInfo() {
               default:
                 break
             }
-            if(vo.ddwRemainTm === 0 && vo.strBuildIndex !== 'food') {
+            if(vo.ddwRemainTm === 0 && vo.ddwProductCoin !== minProductCoin) {
               let dwIsFree;
               if(vo.dwFreeMin !== 0) {
                 dwIsFree = 1
               } else {
                 dwIsFree = 0
               }
+              console.log(`【${buildNmae}】雇佣费用：${vo.ddwCostCoin}金币 增加收益：${vo.ddwProductCoin}金币`)
               const body = `strBuildIndex=${vo.strBuildIndex}&dwIsFree=${dwIsFree}&ddwConsumeCoin=${vo.ddwCostCoin}`
               await employTourGuide(body, buildNmae)
-            } else if (vo.strBuildIndex !== 'food') {
+            } else if (vo.ddwProductCoin !== minProductCoin) {
               console.log(`【${buildNmae}】无可雇佣导游`)
             }
             await $.wait(2000)
@@ -1102,8 +1203,12 @@ function helpByStage(shareCodes) {
             console.log(`助力失败：${data.sErrMsg}`)
             $.canHelp = false
           } else if (data.iRet === 2229 || data.sErrMsg === '助力失败啦~') {
-            console.log(`助力失败：您的账号或者被助力的账号可能已黑，请联系客服`)
-            // $.canHelp = false
+            console.log(`助力失败：您的账号或被助力的账号可能已黑，请联系客服`)
+            num++
+            if (num === 5) $.canHelp = false
+          } else if (data.iRet === 2190 || data.sErrMsg === '达到助力上限') {
+            console.log(`助力失败：${data.sErrMsg}`)
+            $.delcode = true
           } else {
             console.log(`助力失败：${data.sErrMsg}`)
           }
@@ -1167,9 +1272,10 @@ function getUserInfo(showInvite = true) {
             sErrMsg,
             strMyShareId,
             dwLandLvl,
-            Fund = {},
+            LeadInfo = {},
             StoryInfo = {},
-            Business = {}
+            Business = {},
+            XbStatus = {}
           } = data;
           if (showInvite) {
             console.log(`\n获取用户信息：${sErrMsg}\n${$.showLog ? data : ""}`);
@@ -1187,16 +1293,18 @@ function getUserInfo(showInvite = true) {
             ddwCoinBalance,
             strMyShareId,
             dwLandLvl,
-            Fund,
-            StoryInfo
+            LeadInfo,
+            StoryInfo,
+            XbStatus
           };
           resolve({
             buildInfo,
             ddwRichBalance,
             ddwCoinBalance,
             strMyShareId,
-            Fund,
-            StoryInfo
+            LeadInfo,
+            StoryInfo,
+            XbStatus
           });
         }
       } catch (e) {
@@ -1204,8 +1312,8 @@ function getUserInfo(showInvite = true) {
       } finally {
         resolve();
       }
-    });
-  });
+    })
+  })
 }
 
 //任务
@@ -1449,7 +1557,7 @@ function biz(contents){
         Referer: "https://st.jingxi.com/fortune_island/index.html?ptag=138631.26.55",
         "Accept-Encoding": "gzip, deflate, br",
         Host: 'm.jingxi.com',
-        "User-Agent": `jdpingou;iPhone;3.15.2;14.2.1;ea00763447803eb0f32045dcba629c248ea53bb3;network/wifi;model/iPhone13,2;appBuild/100365;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/${Math.random * 98 + 1};pap/JA2015_311210;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`,
+        "User-Agent": UA,
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
       }
     }
@@ -1467,8 +1575,8 @@ function biz(contents){
   })
 }
 
-function taskUrl(function_path, body = '') {
-  let url = `${JD_API_HOST}jxbfd/${function_path}?strZone=jxbfd&bizCode=jxbfd&source=jxbfd&dwEnv=7&_cfd_t=${Date.now()}&ptag=138631.26.55&${body}&_stk=_cfd_t%2CbizCode%2CddwTaskId%2CdwEnv%2Cptag%2Csource%2CstrShareId%2CstrZone&_ste=1`;
+function taskUrl(function_path, body = '', dwEnv = 7) {
+  let url = `${JD_API_HOST}jxbfd/${function_path}?strZone=jxbfd&bizCode=jxbfd&source=jxbfd&dwEnv=${dwEnv}&_cfd_t=${Date.now()}&ptag=138631.26.55&${body}&_stk=_cfd_t%2CbizCode%2CddwTaskId%2CdwEnv%2Cptag%2Csource%2CstrShareId%2CstrZone&_ste=1`;
   url += `&h5st=${decrypt(Date.now(), '', '', url)}&_=${Date.now() + 2}&sceneval=2&g_login_type=1&g_ty=ls`;
   return {
     url,
@@ -1479,7 +1587,7 @@ function taskUrl(function_path, body = '') {
       Referer:"https://st.jingxi.com/fortune_island/index.html?ptag=138631.26.55",
       "Accept-Encoding": "gzip, deflate, br",
       Host: "m.jingxi.com",
-      "User-Agent":`jdpingou;iPhone;3.15.2;14.2.1;ea00763447803eb0f32045dcba629c248ea53bb3;network/wifi;model/iPhone13,2;appBuild/100365;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/${Math.random * 98 + 1};pap/JA2015_311210;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`,
+      "User-Agent": UA,
       "Accept-Language": "zh-cn",
     },
     timeout: 10000
@@ -1498,11 +1606,19 @@ function taskListUrl(function_path, body = '', bizCode = 'jxbfd') {
       Referer:"https://st.jingxi.com/fortune_island/index.html?ptag=138631.26.55",
       "Accept-Encoding": "gzip, deflate, br",
       Host: "m.jingxi.com",
-      "User-Agent":`jdpingou;iPhone;3.15.2;14.2.1;ea00763447803eb0f32045dcba629c248ea53bb3;network/wifi;model/iPhone13,2;appBuild/100365;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/${Math.random * 98 + 1};pap/JA2015_311210;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`,
+      "User-Agent": UA,
       "Accept-Language": "zh-cn",
     },
     timeout: 10000
   };
+}
+
+function randomString(e) {
+  e = e || 32;
+  let t = "0123456789abcdef", a = t.length, n = "";
+  for (let i = 0; i < e; i++)
+    n += t.charAt(Math.floor(Math.random() * a));
+  return n
 }
 
 function showMsg() {
@@ -1604,9 +1720,9 @@ function requireConfig() {
 function TotalBean() {
   return new Promise(async resolve => {
     const options = {
-      url: "https://wq.jd.com/user_new/info/GetJDUserInfoUnion?sceneval=2",
+      url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
       headers: {
-        Host: "wq.jd.com",
+        Host: "me-api.jd.com",
         Accept: "*/*",
         Connection: "keep-alive",
         Cookie: cookie,
@@ -1623,11 +1739,11 @@ function TotalBean() {
         } else {
           if (data) {
             data = JSON.parse(data);
-            if (data['retcode'] === 1001) {
+            if (data['retcode'] === "1001") {
               $.isLogin = false; //cookie过期
               return;
             }
-            if (data['retcode'] === 0 && data.data && data.data.hasOwnProperty("userInfo")) {
+            if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
               $.nickName = data.data.userInfo.baseInfo.nickname;
             }
           } else {

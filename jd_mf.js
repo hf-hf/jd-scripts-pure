@@ -104,8 +104,8 @@ let allMessage = '';
 async function jdMofang() {
   console.log(`集魔方 赢大奖`)
   await getInteractionHomeInfo()
-  console.log(`\n集魔方 抽京豆 赢新品`)
-  await getInteractionInfo()
+  // console.log(`\n集魔方 抽京豆 赢新品`)
+  // await getInteractionInfo()
 }
 
 async function getInteractionHomeInfo() {
@@ -143,9 +143,9 @@ async function queryInteractiveInfo(encryptProjectId, sourceCode) {
               let vo = data.assignmentList[key]
               if (vo.ext.extraType === "sign1") {
                 console.log(`去做【${vo.assignmentName}】`)
-                let signDay = (vo.ext[vo.ext.extraType].signList && vo.ext[vo.ext.extraType].signList.length) || 0
-                $.type = vo.rewards[signDay].rewardType
                 if (vo.ext[vo.ext.extraType].status !== 2) {
+                  let signDay = (vo.ext[vo.ext.extraType].signList && vo.ext[vo.ext.extraType].signList.length) || 0
+                  $.type = vo.rewards[signDay].rewardType
                   await doInteractiveAssignment(vo.ext.extraType, encryptProjectId, sourceCode, vo.encryptAssignmentId, vo.ext[vo.ext.extraType].itemId)
                 } else {
                   console.log(`今日已签到`)
@@ -304,12 +304,11 @@ async function getInteractionInfo(type = true) {
               }
               data = await getInteractionInfo(false)
               if (data.result.hasFinalLottery === 0) {
-                // let num = 0
-                // for (let key of Object.keys(data.result.taskPoolInfo.taskRecord)) {
-                //   let vo = data.result.taskPoolInfo.taskRecord[key]
-                //   num += vo
-                // }
-                let num = 9
+                let num = 0
+                for (let key of Object.keys(data.result.taskPoolInfo.taskRecord)) {
+                  let vo = data.result.taskPoolInfo.taskRecord[key]
+                  num += vo
+                }
                 if (num >= 9) {
                   console.log(`共找到${num}个魔方，可开启礼盒`)
                   await getNewFinalLotteryInfo()

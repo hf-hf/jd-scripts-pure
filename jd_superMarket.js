@@ -26,7 +26,7 @@ let cookiesArr = [],
     jdSuperMarketShareArr = [],
     notify, newShareCodes;
 let helpAu = false; //给作者助力 免费拿,省钱大赢家等活动.默认true是,false不助力.
-
+helpAu = $.isNode() ? (process.env.HELP_AUTHOR ? process.env.HELP_AUTHOR === 'true' : helpAu) : helpAu;
 let jdNotify = true; //用来是否关闭弹窗通知，true表示关闭，false表示开启。
 let superMarketUpgrade = true; //自动升级,顺序:解锁升级商品、升级货架,true表示自动升级,false表示关闭自动升级
 let businessCircleJump = true; //小于对方300热力值自动更换商圈队伍,true表示运行,false表示禁止

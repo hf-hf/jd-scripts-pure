@@ -6,17 +6,17 @@
 =================================Quantumultx=========================
 [task_local]
 #城城领现金
-0 0-23/1 * * * https://jdsharedresourcescdn.azureedge.net/jdresource/jd_city.js, tag=城城领现金, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
+0 0-23/1 * * * https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_city.js, tag=城城领现金, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 
 =================================Loon===================================
 [Script]
-cron "0 0-23/1 * * *" script-path=https://jdsharedresourcescdn.azureedge.net/jdresource/jd_city.js,tag=城城领现金
+cron "0 0-23/1 * * *" script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_city.js,tag=城城领现金
 
 ===================================Surge================================
-城城领现金 = type=cron,cronexp="0 0-23/1 * * *",wake-system=1,timeout=3600,script-path=https://jdsharedresourcescdn.azureedge.net/jdresource/jd_city.js
+城城领现金 = type=cron,cronexp="0 0-23/1 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_city.js
 
 ====================================小火箭=============================
-城城领现金 = type=cron,script-path=https://jdsharedresourcescdn.azureedge.net/jdresource/jd_city.js, cronexpr="0 0-23/1 * * *", timeout=3600, enable=true
+城城领现金 = type=cron,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_city.js, cronexpr="0 0-23/1 * * *", timeout=3600, enable=true
  */
 const $ = new Env('城城领现金');
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -26,7 +26,6 @@ const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let exchangeFlag = $.getdata('jdJxdExchange') || !!0;//是否开启自动抽奖，建议活动快结束开启，默认关闭
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
-
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
     cookiesArr.push(jdCookieNode[item])
@@ -103,7 +102,7 @@ let inviteCodes = [
         }
       } else {
         //默认6.2开启抽奖
-        if ((new Date().getMonth()  + 1) === 6 && new Date().getDate() >= 2) {
+        if ((new Date().getMonth()  + 1) === 10 && new Date().getDate() >= 29) {
           const res = await city_lotteryAward();//抽奖
           if (res && res > 0) {
             for (let i = 0; i < new Array(res).fill('').length; i++) {
@@ -256,9 +255,8 @@ function city_lotteryAward() {
   })
 }
 function readShareCode() {
-  console.log(`开始`)
   return new Promise(async resolve => {
-    $.get({url: `http://share.turinglabs.net/api/v3/city/query/10/`, 'timeout': 10000}, (err, resp, data) => {
+    $.get({url: `http://transfer.nz.lu/city`, 'timeout': 10000}, (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
@@ -290,7 +288,7 @@ function shareCodesFormat() {
       const tempIndex = $.index > inviteCodes.length ? (inviteCodes.length - 1) : ($.index - 1);
       $.newShareCodes = inviteCodes[tempIndex].split('@');
     }
-    const readShareCodeRes = null;//await readShareCode();
+    const readShareCodeRes = null//await readShareCode();
     if (readShareCodeRes && readShareCodeRes.code === 200) {
       $.newShareCodes = [...new Set([...$.newShareCodes, ...(readShareCodeRes.data || [])])];
     }

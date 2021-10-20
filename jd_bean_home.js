@@ -147,10 +147,12 @@ async function jdBeanHome() {
     await $.wait(1000)
     await queryCouponInfo()
     $.doneState = false
+    let num = 0
     do {
       await $.wait(2000)
       await beanTaskList(2)
-    } while (!$.doneState)
+      num++
+    } while (!$.doneState && num < 5)
     await $.wait(2000)
     if ($.doneState) await beanTaskList(3)
 
@@ -203,16 +205,18 @@ async function beanTaskList(type) {
             switch (type) {
               case 1:
                 console.log(`当前等级:${data.data.curLevel} 下一级可领取:${data.data.nextLevelBeanNum || 0}京豆`)
-                if (!data.data.viewAppHome.takenTask) {
-                  console.log(`去做[${data.data.viewAppHome.mainTitle}]`)
-                  await beanHomeIconDoTask({"flag":"0","viewChannel":"myjd"})
-                }
-                await $.wait(2000)
-                if (!data.data.viewAppHome.doneTask) {
-                  console.log(`去领奖[${data.data.viewAppHome.mainTitle}]`)
-                  await beanHomeIconDoTask({"flag":"1","viewChannel":"AppHome"})
-                } else {
-                  console.log(`[${data.data.viewAppHome.mainTitle}]已做完`)
+                if (data.data.viewAppHome) {
+                  if (!data.data.viewAppHome.takenTask) {
+                    console.log(`去做[${data.data.viewAppHome.mainTitle}]`)
+                    await beanHomeIconDoTask({"flag":"0","viewChannel":"myjd"})
+                  }
+                  await $.wait(2000)
+                  if (!data.data.viewAppHome.doneTask) {
+                    console.log(`去领奖[${data.data.viewAppHome.mainTitle}]`)
+                    await beanHomeIconDoTask({"flag":"1","viewChannel":"AppHome"})
+                  } else {
+                    console.log(`[${data.data.viewAppHome.mainTitle}]已做完`)
+                  }
                 }
                 break
               case 2:
@@ -225,11 +229,11 @@ async function beanTaskList(type) {
                       let taskList = vo.subTaskVOS[key]
                       if (taskList.status === 1) {
                         $.doneState = false
-                        console.log(`去做[${vo.taskName}]${taskList.title}`)
+                        console.log(`去做[${vo.taskName}]${taskList.title || ''}`)
                         await $.wait(2000)
                         await beanDoTask({"actionType": 1, "taskToken": `${taskList.taskToken}`}, vo.taskType)
-                        if (vo.taskType === 9) {
-                          await $.wait(3000)
+                        if (vo.taskType === 9 || vo.taskType === 8) {
+                          await $.wait(vo.waitDuration * 1000 || 5000)
                           await beanDoTask({"actionType": 0, "taskToken": `${taskList.taskToken}`}, vo.taskType)
                         }
                       }
@@ -268,7 +272,7 @@ function beanDoTask(body, taskType) {
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
-            if (body.actionType === 1 && taskType !== 9) {
+            if (body.actionType === 1 && (taskType !== 9 && taskType !== 8)) {
               if (data.code === "0" && data.data.bizCode === "0") {
                 console.log(`完成任务，获得+${data.data.score}成长值`)
               } else {

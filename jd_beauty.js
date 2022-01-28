@@ -246,6 +246,7 @@ async function mr() {
          // }
           break
         case "shop_products":
+          console.log($.taskState)
           let count = $.taskState.shop_view.length;
           if (count < $.taskState.daily_shop_follow_times) console.log(`\n去做关注店铺任务\n`);
           for (let i = 0; i < vo.data.shops.length && count < $.taskState.daily_shop_follow_times; ++i) {

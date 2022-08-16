@@ -1,20 +1,14 @@
 
 /*
-探味奇遇记
-活动入口：美食馆-右侧悬浮
-活动时间：8月20之前
-宝箱陆续开放
-来自：6dylan6/jdpro
-31 0,13 13-20 8 * jd_tanwei.js
+10 10 * * * jd_shangou.js
  */
 
-const $ = new Env('探味奇遇记');
+const $ = new Env('闪购签到有礼');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let jdNotify = true;
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message = '';
-let encryptProjectId = 'YnxEZcUsgLzE5dukqb7vrmjPnaN';
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
     cookiesArr.push(jdCookieNode[item])
@@ -45,7 +39,7 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
         }
         continue
       }
-      await twqyj();
+      await shangou();
 	  await $.wait(1000)
     }
   }
@@ -58,74 +52,23 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
   })
 
 
-async function twqyj() {
-  try {
-    let tk = await queryInteractiveInfo();
-    for (let key of Object.keys(tk.assignmentList).reverse()){
-        let vo = tk.assignmentList[key]
-        if (vo.completionFlag && vo.assignmentType != 30) {
-            console.log('此任务已完成')
-        } else if (new Date(vo.assignmentStartTime).getTime() > Date.now()) {
-            console.log('此任务还没到开放时间:',vo.assignmentStartTime)
-        } else if (vo.assignmentType == 30) {
-            await dotask(encryptProjectId,vo.encryptAssignmentId,{"ext":{"exchangeNum":1}})
-        } else {
-		    if (vo.ext && vo.ext.extraType == 'sign1') {
-	              await sign(encryptProjectId,vo.encryptAssignmentId)
-            } else {
-			      await dotask(encryptProjectId,vo.encryptAssignmentId)
-	          }
-          }
-	    await $.wait(1000)    
-	}
-  } catch (e) {
-    $.logErr(e)
-  }
 
-}
-
-async function queryInteractiveInfo() {
+async function shangou() {
   return new Promise(async (resolve) => {
-    $.post(taskUrl("queryInteractiveInfo", {"encryptProjectId":encryptProjectId,"sourceCode":"acemsg0406"}), async (err, resp, data) => {
+    $.get(taskUrl(), async (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`queryInteractiveInfo API请求失败，请检查网路重试`)
+          console.log(`API请求失败，请检查网路重试`)
         } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data)
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data)
-      }
-    })
-  })
-}
-
-async function sign(encryptProjectId, AssignmentId) {
-  return new Promise(async (resolve) => {
-    $.post(taskUrl("doInteractiveAssignment", { "encryptProjectId": encryptProjectId, "encryptAssignmentId": AssignmentId, "sourceCode": "acemsg0406", "itemId": "1", "completionFlag": "true" }), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`doInteractiveAssignment API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data)
-            if (data.subCode == 0) {
-              if (data.rewardsInfo.successRewards['3'] && data.rewardsInfo.successRewards['3'].length != 0) {
-                console.log(`${data.rewardsInfo.successRewards['3'][0].rewardName},获得${data.rewardsInfo.successRewards['3'][0].quantity}京豆`);
-              } else if (data.rewardsInfo.failRewards.length != 0) {
-                console.log(`失败：${data.rewardsInfo.failRewards[0].msg}`);
-              }
-            } else {
-              console.log(data.msg);
+             data = JSON.parse(data)
+             if (data.subCode == 0){
+               console.log(data.msg)
+               console.log(data.rewardsInfo?.successRewards[3][0]?.quantity||'空气')
+            }else{
+              console.log(data.msg)
             }
-          }
-        }
+          } 
       } catch (e) {
         $.logErr(e, resp)
       } finally {
@@ -135,46 +78,14 @@ async function sign(encryptProjectId, AssignmentId) {
   })
 }
 
-async function dotask(encryptProjectId, AssignmentId, body1 = {}) {
-  let body = { "encryptProjectId": encryptProjectId, "encryptAssignmentId": AssignmentId, "sourceCode": "acemsg0406", "completionFlag": true,...body1}
-  return new Promise(async (resolve) => {
-    $.post(taskUrl("doInteractiveAssignment", body), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`doInteractiveAssignment API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data)
-            if (data.subCode == '0' && data.rewardsInfo.hasOwnProperty('successRewards') ) {
-              if (data.rewardsInfo.successRewards['3'] && data.rewardsInfo.successRewards['3'].length != 0) {
-                console.log(`${data.rewardsInfo.successRewards['3'][0].rewardName},获得${data.rewardsInfo.successRewards['3'][0].quantity}京豆`);
-//              } else if (data.rewardsInfo.failRewards.length != 0) {
-//                console.log(`失败：${data.rewardsInfo.failRewards[0].msg}`);
-              }
-            } else {
-              console.log(data.msg);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data)
-      }
-    })
-  })
-}
-
-function taskUrl(functionId, body = {}) {
+function taskUrl() {
   return {
-    url: `${JD_API_HOST}?functionId=${functionId}&body=${encodeURI(JSON.stringify(body))}&appid=publicUseApi&client=wh5&clientVersion=1.0.0&networkType=&t=${(new Date).getTime()}`,
+    url: `https://api.m.jd.com/client.action?client=wh5&clientVersion=1.0.0&osVersion=15.1.1&networkType=wifi&functionId=doInteractiveAssignment&t=1640952130681&body={"itemId":"1","completionFlag":true,"encryptAssignmentId":"2mbhaGkggQQGGM3imR2o3BMqAbFH","encryptProjectId":"5wAnzYsAWyq94z4TQ6N2tjVKmeB","sourceCode":"aceshangou0608","lat":"0.000000","lng":"0.000000"}`,
     headers: {
       'Host': 'api.m.jd.com',
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Origin': 'https://h5.m.jd.com',
+      'accept':'application/json, text/plain, */*',
+      'Origin': 'https://prodev.m.jd.com',
       'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-      'Referer': 'https://h5.m.jd.com/babelDiy/Zeus/4HEXbcWBwHW2yxmoY9LnBoCZ9kcB/index.html',
       'Cookie': cookie
     }
   }

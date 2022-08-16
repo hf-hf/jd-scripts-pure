@@ -30,7 +30,13 @@ let appId, fingerprint, token, enCryptMethodJD;
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
         return;
     }
-    console.log('请务必填写你的Code！变量：export CODE618="" \n\n请务必填写你的Code！变量：export CODE618=""\n\n个人建议禁用,避免其他问题\n')
+		if (!$.CODE618 && cookiesArr.length > 20){
+			console.log(`\n衰仔、你的账号数量已经超越大部分人啦！o(╥﹏╥)o\n\n不填写准确的变量实在无法运行！[○･｀Д´･ ○]\n\n变量格式▶▶▶：export CODE618=""\n`)
+			return;
+		}
+		if (cookiesArr.length <= 20){
+			console.log(`\n推荐填写自己的Code！o(╥﹏╥)o\n变量格式▶▶▶：export CODE618=""\n`)
+		} 		
     $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
     appId = '6a98d';
     let fglist = ['6289931560897925', '0403403318679778', '1390288884563462'];
@@ -44,6 +50,7 @@ let appId, fingerprint, token, enCryptMethodJD;
     let runCK = [];
     for (let i = 0; i < cookiesArr.length; i += 1) {
         runCK.push(cookiesArr.slice(i, i + 1));
+				
     }
     for (let i = 0; i < runCK.length; i++) {
         const promiseArr = runCK[i].map((ck, index) => main(ck));
@@ -59,7 +66,11 @@ async function main(ck, code = 'Jt4KpgH') {
     let jfInfo = await getInfoByUrl($, ck, code);
     ck = jfInfo['ck'];
     let url2 = jfInfo['url'];
-    let UA = getUA();
+    // let UA = getUA();
+    $.ADID = getUUID('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 1);
+    $.UUID = getUUID('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+    let UA = `jdapp;iPhone;9.5.4;13.6;${$.UUID};network/wifi;ADID/${$.ADID};model/iPhone10,3;addressid/0;appBuild/167668;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`;
+    
     let actId = url2.match(/mall\/active\/([^/]+)\/index\.html/) && url2.match(/mall\/active\/([^/]+)\/index\.html/)[1] || '31e6keDr2FdaUEVSvNZM2kjD7QVx';
     await getHtml(url2, ck, UA)
     await takeRequest(ck, UA, userName, actId, code);
@@ -79,6 +90,17 @@ function getUA() {
     let build = ["167814", "167841"][randomNum(0, 1)]
     let appVersion = buildMap[build]
     return `jdapp;iPhone;${appVersion};${osVersion};${UUID};${network};model/${mobile};addressid/${randomNum(1e9)};appBuild/${build};jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS ${osVersion.replace(/\./g, "_")} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`
+}
+function getUUID(format = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', UpperCase = 0) {
+    return format.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        if (UpperCase) {
+            uuid = v.toString(36).toUpperCase();
+        } else {
+            uuid = v.toString(36)
+        }
+        return uuid;
+    });
 }
 function randomNum(min, max) {
     if (arguments.length === 0) return Math.random()

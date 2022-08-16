@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/jd_mohe.js",
+            "program": "${workspaceFolder}/jd_plantBean.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]
